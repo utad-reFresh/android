@@ -3,5 +3,5 @@
 </div>
 
 ----
-# reFresh Android
+# reFresh Android ![build status](https://github.com/utad-reFresh/android/actions/workflows/gradle.yml/badge.svg?event=push)
 Aplicação Android desenvolvida em Kotlin que interage com a API do [reFresh Core](https://github.com/utad-reFresh/core/) para implementar todas as funcionalidades do reFresh.
