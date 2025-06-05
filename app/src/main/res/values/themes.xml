@@ -14,9 +14,11 @@
         <!-- Customize your theme here. -->
     </style>
 
-    <style name="Theme.ReFresh.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
+    <style name="Theme.ReFresh.NoActionBar" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/green_primary</item>
+        <item name="colorPrimaryVariant">@color/green_dark</item>
+        <item name="colorSecondary">@color/green_light</item>
+        <item name="android:statusBarColor">@color/green_dark</item>
     </style>
 
     <style name="Theme.ReFresh.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
