@@ -83,6 +83,14 @@
                 android:text="Não tem conta? Registre-se"
                 android:textColor="@color/green_dark" />
 
+            <TextView
+                android:id="@+id/tvSkip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SKIP"
+                android:layout_gravity="center"
+                android:layout_marginTop="8dp"/>
+
         </LinearLayout>
         <!-- Adicione após o MaterialButton do login -->
     </com.google.android.material.card.MaterialCardView>
