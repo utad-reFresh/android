@@ -8,8 +8,6 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.launch
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 class RegisterActivity : AppCompatActivity() {
     private lateinit var tilName: TextInputLayout
@@ -91,16 +89,18 @@ class RegisterActivity : AppCompatActivity() {
 
                 val response = ApiClient.apiService.register(request)
 
-                if (response.isSuccessful) {
-                    response.body()?.let { authResponse: AuthResponse ->
-                        SessionManager(this@RegisterActivity).saveAuthToken(authResponse.token)
-                        startActivity(Intent(this@RegisterActivity, MainActivity::class.java))
-                        finish()
-                    }
+                if (response.code() == 200) {
+                    Toast.makeText(
+                        this@RegisterActivity,
+                        "Registro realizado com sucesso!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    startActivity(Intent(this@RegisterActivity, LoginActivity::class.java))
+                    finish()
                 } else {
                     Toast.makeText(
                         this@RegisterActivity,
-                        "Erro no registro: ${response.errorBody()?.string()}",
+                        "Erro no registro. Código: ${response.code()}",
                         Toast.LENGTH_LONG
                     ).show()
                 }
@@ -117,11 +117,23 @@ class RegisterActivity : AppCompatActivity() {
 
 object ApiClient {
     private const val BASE_URL = "https://refresh.jestev.es/api/"
+    lateinit var apiService: ApiService
 
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
+    init {
+        val logging = okhttp3.logging.HttpLoggingInterceptor().apply {
+            level = okhttp3.logging.HttpLoggingInterceptor.Level.BODY
+        }
 
-    val apiService: ApiService = retrofit.create(ApiService::class.java)
+        val client = okhttp3.OkHttpClient.Builder()
+            .addInterceptor(logging)
+            .build()
+
+        val retrofit = retrofit2.Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(client)
+            .addConverterFactory(retrofit2.converter.gson.GsonConverterFactory.create())
+            .build()
+
+        apiService = retrofit.create(ApiService::class.java)
+    }
 }
