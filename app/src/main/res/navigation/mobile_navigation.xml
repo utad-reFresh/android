@@ -28,4 +28,12 @@
         android:name="pt.utad.refresh.ui.settings.SettingsFragment"
         android:label="@string/menu_settings"
         tools:layout="@layout/fragment_settings" />
+
+    <fragment
+        android:id="@+id/nav_receitas"
+        android:name="pt.utad.refresh.ui.receitas.ReceitasFragment"
+        android:label="Receitas"
+        tools:layout="@layout/fragment_receitas" />
+
+
 </navigation>

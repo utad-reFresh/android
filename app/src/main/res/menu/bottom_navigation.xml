@@ -16,5 +16,10 @@
             android:id="@+id/nav_slideshow"
             android:icon="@drawable/person_24px"
             android:title="Perfil" />
+
+        <item
+            android:id="@+id/nav_receitas"
+            android:icon="@drawable/egg_alt_24px"
+            android:title="Receitas" />
     </group>
 </menu>
