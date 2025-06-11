@@ -35,7 +35,6 @@ import androidx.camera.core.FocusMeteringAction
 import pt.utad.refresh.R
 
 
-@OptIn(ExperimentalGetImage::class)
 class ScannerFragment : Fragment() {
     private var _binding: FragmentScannerBinding? = null
     private val binding get() = _binding!!
