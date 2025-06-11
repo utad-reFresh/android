@@ -1,10 +1,10 @@
-package pt.utad.refresh.ui.reflow
+package pt.utad.refresh.ui.scanner
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class ReflowViewModel : ViewModel() {
+class ScannerViewModel : ViewModel() {
 
     private val _text = MutableLiveData<String>().apply {
         value = "This is reflow Fragment"

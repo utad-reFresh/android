@@ -1,10 +1,10 @@
-package pt.utad.refresh.ui.transform
+package pt.utad.refresh.ui.ingredientes
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class TransformViewModel : ViewModel() {
+class IngredientesViewModel : ViewModel() {
 
     private val _texts = MutableLiveData<List<String>>().apply {
         value = (1..16).mapIndexed { _, i ->

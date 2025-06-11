@@ -1,4 +1,4 @@
-package pt.utad.refresh.ui.transform
+package pt.utad.refresh.ui.ingredientes
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,12 +13,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import pt.utad.refresh.R
-import pt.utad.refresh.databinding.FragmentTransformBinding
+import pt.utad.refresh.databinding.FragmentIngredientesBinding
 import pt.utad.refresh.databinding.ItemTransformBinding
 
-class TransformFragment : Fragment() {
+class IngredientesFragment : Fragment() {
 
-    private var _binding: FragmentTransformBinding? = null
+    private var _binding: FragmentIngredientesBinding? = null
 
     private val binding get() = _binding!!
 
@@ -27,14 +27,14 @@ class TransformFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val transformViewModel = ViewModelProvider(this).get(TransformViewModel::class.java)
-        _binding = FragmentTransformBinding.inflate(inflater, container, false)
+        val ingredientesViewModel = ViewModelProvider(this).get(IngredientesViewModel::class.java)
+        _binding = FragmentIngredientesBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
         val recyclerView = binding.recyclerviewTransform
         val adapter = TransformAdapter()
         recyclerView.adapter = adapter
-        transformViewModel.texts.observe(viewLifecycleOwner) {
+        ingredientesViewModel.texts.observe(viewLifecycleOwner) {
             adapter.submitList(it)
         }
         return root

@@ -7,21 +7,21 @@
 
     <fragment
         android:id="@+id/nav_transform"
-        android:name="pt.utad.refresh.ui.transform.TransformFragment"
+        android:name="pt.utad.refresh.ui.ingredientes.IngredientesFragment"
         android:label="@string/menu_transform"
-        tools:layout="@layout/fragment_transform" />
+        tools:layout="@layout/fragment_ingredientes" />
 
     <fragment
-        android:id="@+id/nav_reflow"
-        android:name="pt.utad.refresh.ui.reflow.ReflowFragment"
+        android:id="@+id/nav_scanner"
+        android:name="pt.utad.refresh.ui.scanner.ScannerFragment"
         android:label="@string/menu_reflow"
-        tools:layout="@layout/fragment_reflow" />
+        tools:layout="@layout/fragment_scanner" />
 
     <fragment
-        android:id="@+id/nav_slideshow"
-        android:name="pt.utad.refresh.ui.slideshow.SlideshowFragment"
+        android:id="@+id/nav_perfil"
+        android:name="pt.utad.refresh.ui.perfil.SlideshowFragment"
         android:label="@string/menu_slideshow"
-        tools:layout="@layout/fragment_slideshow" />
+        tools:layout="@layout/fragment_perfil" />
 
     <fragment
         android:id="@+id/nav_settings"

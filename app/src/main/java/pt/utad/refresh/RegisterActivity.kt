@@ -115,25 +115,3 @@ class RegisterActivity : AppCompatActivity() {
     }
 }
 
-object ApiClient {
-    private const val BASE_URL = "https://refresh.jestev.es/api/"
-    lateinit var apiService: ApiService
-
-    init {
-        val logging = okhttp3.logging.HttpLoggingInterceptor().apply {
-            level = okhttp3.logging.HttpLoggingInterceptor.Level.BODY
-        }
-
-        val client = okhttp3.OkHttpClient.Builder()
-            .addInterceptor(logging)
-            .build()
-
-        val retrofit = retrofit2.Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .client(client)
-            .addConverterFactory(retrofit2.converter.gson.GsonConverterFactory.create())
-            .build()
-
-        apiService = retrofit.create(ApiService::class.java)
-    }
-}

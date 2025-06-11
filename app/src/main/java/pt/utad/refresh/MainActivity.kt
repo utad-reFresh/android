@@ -1,5 +1,6 @@
 package pt.utad.refresh
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -20,6 +21,18 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val sessionManager = SessionManager(this)
+        val token = sessionManager.getAuthToken()
+
+        if (token.isNullOrEmpty()) {
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+            return
+        }
+
+        ApiClient.init(sessionManager)
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -36,7 +49,7 @@ class MainActivity : AppCompatActivity() {
         binding.navView?.let {
             appBarConfiguration = AppBarConfiguration(
                 setOf(
-                    R.id.nav_transform, R.id.nav_reflow, R.id.nav_slideshow, R.id.nav_settings
+                    R.id.nav_transform, R.id.nav_scanner, R.id.nav_perfil, R.id.nav_settings
                 ),
                 binding.drawerLayout
             )
@@ -46,7 +59,7 @@ class MainActivity : AppCompatActivity() {
         binding.appBarMain.contentMain.bottomNavView?.let {
             appBarConfiguration = AppBarConfiguration(
                 setOf(
-                    R.id.nav_transform, R.id.nav_reflow, R.id.nav_slideshow
+                    R.id.nav_transform, R.id.nav_scanner, R.id.nav_perfil
                 )
             )
             it.setupWithNavController(navController)

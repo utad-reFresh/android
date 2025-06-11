@@ -1,4 +1,4 @@
-package pt.utad.refresh.ui.slideshow
+package pt.utad.refresh.ui.perfil
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,17 +11,32 @@ import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import androidx.activity.result.contract.ActivityResultContracts
 import pt.utad.refresh.R
-import pt.utad.refresh.databinding.FragmentSlideshowBinding
+import pt.utad.refresh.databinding.FragmentPerfilBinding
+import pt.utad.refresh.ApiClient
+import pt.utad.refresh.ApiService
+import kotlinx.coroutines.launch
+
+class SlideshowViewModelFactory(
+    private val apiService: ApiService
+) : ViewModelProvider.Factory {
+    override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(PerfilViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return PerfilViewModel(apiService) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
 
 class SlideshowFragment : Fragment() {
-    private var _binding: FragmentSlideshowBinding? = null
+    private var _binding: FragmentPerfilBinding? = null
     private val binding get() = _binding!!
-    private lateinit var viewModel: SlideshowViewModel
+    private lateinit var viewModel: PerfilViewModel
 
     private val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: android.net.Uri? ->
         uri?.let {
             binding.profileImage.setImageURI(it)
-            lifecycleScope.launchWhenStarted {
+            lifecycleScope.launch {
                 viewModel.updateProfile(
                     binding.profileName.text.toString(),
                     it.toString()
@@ -35,11 +50,19 @@ class SlideshowFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentSlideshowBinding.inflate(inflater, container, false)
-        viewModel = ViewModelProvider(this)[SlideshowViewModel::class.java]
+        _binding = FragmentPerfilBinding.inflate(inflater, container, false)
+
+        val apiService = ApiClient.apiService
+        val factory = SlideshowViewModelFactory(apiService)
+        viewModel = ViewModelProvider(this, factory)[PerfilViewModel::class.java]
 
         setupUI()
         observeViewModel()
+
+        // Fetch user profile when fragment is created
+        lifecycleScope.launch {
+            viewModel.getProfile()
+        }
 
         return binding.root
     }
@@ -50,7 +73,7 @@ class SlideshowFragment : Fragment() {
         }
 
         binding.saveButton.setOnClickListener {
-            lifecycleScope.launchWhenStarted {
+            lifecycleScope.launch {
                 viewModel.updateProfile(
                     binding.profileName.text.toString(),
                     viewModel.userProfile.value?.photoUrl ?: ""
@@ -72,5 +95,10 @@ class SlideshowFragment : Fragment() {
         viewModel.error.observe(viewLifecycleOwner) { error ->
             Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

@@ -1,4 +1,4 @@
-package pt.utad.refresh.ui.reflow
+package pt.utad.refresh.ui.scanner
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -17,7 +17,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
-import pt.utad.refresh.databinding.FragmentReflowBinding
+import pt.utad.refresh.databinding.FragmentScannerBinding
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import androidx.camera.core.ExperimentalGetImage
@@ -31,15 +31,13 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.bumptech.glide.Glide
 import androidx.camera.core.Camera
-import androidx.camera.core.CameraControl
-import androidx.camera.core.CameraInfo
 import androidx.camera.core.FocusMeteringAction
 import pt.utad.refresh.R
 
 
 @OptIn(ExperimentalGetImage::class)
-class ReflowFragment : Fragment() {
-    private var _binding: FragmentReflowBinding? = null
+class ScannerFragment : Fragment() {
+    private var _binding: FragmentScannerBinding? = null
     private val binding get() = _binding!!
     private lateinit var cameraExecutor: ExecutorService
     private var cameraProvider: ProcessCameraProvider? = null
@@ -53,7 +51,7 @@ class ReflowFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentReflowBinding.inflate(inflater, container, false)
+        _binding = FragmentScannerBinding.inflate(inflater, container, false)
 
         if (allPermissionsGranted()) {
             startCamera()
