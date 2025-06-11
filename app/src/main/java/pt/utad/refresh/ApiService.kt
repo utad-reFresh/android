@@ -10,4 +10,10 @@ interface ApiService {
 
     @POST("Account/login")
     suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
+
+    @POST("Account/changePassword")
+    suspend fun changePassword(@Body request: ChangePasswordRequest): Response<Unit>
+
+    @POST("Account/changeUserData")
+    suspend fun updateProfile(@Body request: UpdateProfileRequest): Response<Unit>
 }
