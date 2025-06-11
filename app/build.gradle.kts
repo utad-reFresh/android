@@ -60,4 +60,7 @@ dependencies {
     implementation(libs.androidx.camera.view)
 
     implementation(libs.barcode.scanning)
+    implementation(libs.okhttp)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.glide)
 }
