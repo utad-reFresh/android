@@ -23,15 +23,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         val sessionManager = SessionManager(this)
+
         val token = sessionManager.getAuthToken()
+
+        ApiClient.init(sessionManager)
 
         if (token.isNullOrEmpty()) {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
             return
         }
-
-        ApiClient.init(sessionManager)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
