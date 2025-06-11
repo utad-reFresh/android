@@ -11,7 +11,7 @@
         android:id="@+id/logo"
         android:layout_width="120dp"
         android:layout_height="120dp"
-        android:layout_marginTop="76dp"
+        android:layout_marginTop="32dp"
         android:elevation="4dp"
         android:src="@mipmap/ic_launcher"
         app:layout_constraintEnd_toEndOf="parent"
@@ -19,14 +19,41 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Blur overlay -->
     <androidx.camera.view.PreviewView
         android:id="@+id/view_finder"
         android:layout_width="250dp"
         android:layout_height="250dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.503"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.403" />
+
+    <View
+        android:id="@+id/blur_overlay"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:background="#80FFFFFF"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/view_finder"
+        app:layout_constraintEnd_toEndOf="@id/view_finder"
+        app:layout_constraintStart_toStartOf="@id/view_finder"
+        app:layout_constraintTop_toTopOf="@id/view_finder" />
+
+    <!-- Throbber (ProgressBar) -->
+    <ProgressBar
+        android:id="@+id/loading_bar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:indeterminate="true"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/view_finder"
+        app:layout_constraintEnd_toEndOf="@id/view_finder"
+        app:layout_constraintStart_toStartOf="@id/view_finder"
+        app:layout_constraintTop_toTopOf="@id/view_finder" />
 
     <View
         android:id="@+id/scan_overlay"
@@ -36,7 +63,38 @@
         app:layout_constraintBottom_toBottomOf="@id/view_finder"
         app:layout_constraintEnd_toEndOf="@id/view_finder"
         app:layout_constraintStart_toStartOf="@id/view_finder"
-        app:layout_constraintTop_toTopOf="@id/view_finder" />
+        app:layout_constraintTop_toTopOf="@id/view_finder"
+        />
+
+    <LinearLayout
+        android:id="@+id/camera_controls"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/view_finder"
+        app:layout_constraintStart_toStartOf="@id/view_finder"
+        app:layout_constraintEnd_toEndOf="@id/view_finder"
+        android:layout_marginTop="12dp">
+
+        <ImageButton
+            android:id="@+id/btn_focus"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_focus"
+            android:contentDescription="@string/focus" />
+
+        <ImageButton
+            android:id="@+id/btn_flash"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_flash_off"
+            android:contentDescription="@string/toggle_flash"
+            android:layout_marginStart="24dp" />
+    </LinearLayout>
+
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/instruction_card"
