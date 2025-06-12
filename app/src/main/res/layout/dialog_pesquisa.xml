@@ -21,21 +21,13 @@
             android:orientation="vertical"
             android:padding="24dp">
 
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/ingredient_image"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:layout_gravity="center"
-                android:src="@drawable/egg_40px"
-                app:civ_border_width="0dp"/>
 
             <TextView
-                android:id="@+id/txtIngrediente"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="16dp"
-                android:text="Nome do Ingrediente"
+                android:text="Pesquisar Ingrediente"
                 android:textSize="20sp"
                 android:textStyle="bold"/>
 
@@ -44,53 +36,25 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:hint="Quantidade"
-                app:startIconDrawable="@drawable/scale_24px">
+                android:hint="Nome do Ingrediente"
+                app:startIconDrawable="@drawable/search_24px">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edtQuantidade"
+                    android:id="@+id/edtPesquisa"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="numberDecimal"/>
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:hint="Validade"
-                app:startIconDrawable="@drawable/calendar_month_24px">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edtValidade"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="date"/>
+                    android:inputType="text"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/save_button"
+                android:id="@+id/next_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:padding="15dp"
-                android:text="Adicionar"
+                android:text="Avançar"
                 android:textSize="16sp"
                 app:cornerRadius="8dp"/>
-
-            <TextView
-                android:id="@+id/back_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="16dp"
-                android:text="Voltar"
-                android:textSize="16sp"
-                android:clickable="true"
-                android:focusable="true"
-                android:padding="8dp"
-                android:background="?attr/selectableItemBackgroundBorderless"/>
 
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>

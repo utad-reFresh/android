@@ -57,13 +57,43 @@ class IngredientesFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.titleIngredients?.setOnClickListener {
-            mostrarDialogAdicionar()
+            mostrarDialogPesquisa() // Alterado de mostrarDialogAdicionar para mostrarDialogPesquisa
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun mostrarDialogPesquisa() {
+        val dialog = AlertDialog.Builder(requireContext(), R.style.FullScreenDialog)
+            .create()
+
+        val dialogView = layoutInflater.inflate(R.layout.dialog_pesquisa, null)
+
+        // Inicializar views
+        val edtPesquisa = dialogView.findViewById<TextInputEditText>(R.id.edtPesquisa)
+        val nextButton = dialogView.findViewById<MaterialButton>(R.id.next_button)
+
+        // Configurar botão de avançar
+        nextButton.setOnClickListener {
+            val pesquisa = edtPesquisa.text.toString()
+            if (pesquisa.isNotEmpty()) {
+                dialog.dismiss()
+                mostrarDialogAdicionar()
+            } else {
+                Snackbar.make(dialogView, "Digite o nome do ingrediente", Snackbar.LENGTH_SHORT).show()
+            }
+        }
+
+        // Configurar dialog
+        dialog.setView(dialogView)
+        dialog.window?.apply {
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        }
+        dialog.show()
     }
 
     private fun mostrarDialogAdicionar() {
@@ -78,6 +108,7 @@ class IngredientesFragment : Fragment() {
         val edtQuantidade = dialogView.findViewById<TextInputEditText>(R.id.edtQuantidade)
         val edtValidade = dialogView.findViewById<TextInputEditText>(R.id.edtValidade)
         val btnSalvar = dialogView.findViewById<MaterialButton>(R.id.save_button)
+        val backText = dialogView.findViewById<TextView>(R.id.back_text)
 
         // Configurar campo de validade como date picker
         edtValidade.setOnClickListener {
@@ -96,20 +127,22 @@ class IngredientesFragment : Fragment() {
         // Permitir selecionar imagem ao clicar
         ingredientImage.setOnClickListener {
             // Implementar lógica para selecionar imagem
-            // Por exemplo, abrir galeria ou câmera
+        }
+
+        backText.setOnClickListener {
+            dialog.dismiss()
+            mostrarDialogPesquisa()
         }
 
         // Configurar botão de salvar
         btnSalvar.setOnClickListener {
-            val ingrediente = txtIngrediente.text.toString()
             val quantidade = edtQuantidade.text.toString()
-            val validade = edtValidade.text.toString()
 
-            if (quantidade.isNotEmpty() && validade.isNotEmpty()) {
+            if (quantidade.isNotEmpty()) {
                 // Implementar lógica para salvar os dados
                 dialog.dismiss()
             } else {
-                Snackbar.make(dialogView, "Preencha todos os campos", Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(dialogView, "Indique a quantidade", Snackbar.LENGTH_SHORT).show()
             }
         }
 
