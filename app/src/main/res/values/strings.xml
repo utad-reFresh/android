@@ -26,4 +26,13 @@
     </string>
     <string name="focus">Focus</string>
     <string name="toggle_flash">Toggle Flash</string>
+    <string name="entrar">ENTRAR</string>
+    <string name="senha">Senha</string>
+    <string name="email">Email</string>
+    <string name="n_o_tem_conta_registre_se">Não tem conta? Registre-se</string>
+    <string name="logo_do_refresh">Logo do reFresh</string>
+    <string name="nome">Nome</string>
+    <string name="confirmar_senha">Confirmar Senha</string>
+    <string name="registar">REGISTAR</string>
+    <string name="j_tem_conta_fa_a_login">Já tem conta? Faça login</string>
 </resources>

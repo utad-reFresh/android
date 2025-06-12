@@ -15,7 +15,6 @@ import pt.utad.refresh.databinding.FragmentPerfilBinding
 import pt.utad.refresh.ApiClient
 import pt.utad.refresh.ApiService
 import kotlinx.coroutines.launch
-import kotlin.text.clear
 
 class SlideshowViewModelFactory(
     private val apiService: ApiService

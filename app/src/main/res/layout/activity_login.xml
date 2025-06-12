@@ -10,6 +10,7 @@
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:layout_marginTop="72dp"
+        android:contentDescription="@string/logo_do_refresh"
         android:src="@mipmap/ic_launcher"
         android:elevation="4dp"
         android:transitionName="logo"
@@ -42,7 +43,7 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Email"
+                    android:hint="@string/email"
                     android:inputType="textEmailAddress" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -58,7 +59,7 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Senha"
+                    android:hint="@string/senha"
                     android:inputType="textPassword" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -69,7 +70,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:padding="12dp"
-                android:text="ENTRAR"
+                android:text="@string/entrar"
                 android:textSize="16sp"
                 app:cornerRadius="8dp" />
 
@@ -80,18 +81,10 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="16dp"
                 android:padding="8dp"
-                android:text="Não tem conta? Registre-se"
+                android:text="@string/n_o_tem_conta_registre_se"
                 android:textColor="@color/green_dark" />
 
-            <TextView
-                android:id="@+id/tvSkip"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="SKIP"
-                android:layout_gravity="center"
-                android:layout_marginTop="8dp"/>
 
         </LinearLayout>
-        <!-- Adicione após o MaterialButton do login -->
     </com.google.android.material.card.MaterialCardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

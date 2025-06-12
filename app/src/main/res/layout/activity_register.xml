@@ -10,6 +10,7 @@
         android:layout_width="120dp"
         android:layout_height="120dp"
         android:layout_marginTop="48dp"
+        android:contentDescription="@string/logo_do_refresh"
         android:src="@mipmap/ic_launcher"
         android:elevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -40,7 +41,7 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Nome"
+                    android:hint="@string/nome"
                     android:inputType="textPersonName" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -55,7 +56,7 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Email"
+                    android:hint="@string/email"
                     android:inputType="textEmailAddress" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -71,7 +72,7 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Senha"
+                    android:hint="@string/senha"
                     android:inputType="textPassword" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -87,7 +88,7 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Confirmar Senha"
+                    android:hint="@string/confirmar_senha"
                     android:inputType="textPassword" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -97,7 +98,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:padding="12dp"
-                android:text="REGISTRAR"
+                android:text="@string/registar"
                 android:textSize="16sp"
                 app:cornerRadius="8dp" />
 
@@ -108,7 +109,7 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="16dp"
                 android:padding="8dp"
-                android:text="Já tem conta? Faça login"
+                android:text="@string/j_tem_conta_fa_a_login"
                 android:textColor="@color/green_dark" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
