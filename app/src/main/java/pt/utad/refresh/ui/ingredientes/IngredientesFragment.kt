@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -19,7 +20,6 @@ import pt.utad.refresh.databinding.ItemTransformBinding
 class IngredientesFragment : Fragment() {
 
     private var _binding: FragmentIngredientesBinding? = null
-
     private val binding get() = _binding!!
 
     override fun onCreateView(
@@ -45,16 +45,41 @@ class IngredientesFragment : Fragment() {
         _binding = null
     }
 
-    class TransformAdapter :
-        ListAdapter<String, TransformViewHolder>(object : DiffUtil.ItemCallback<String>() {
+    class TransformViewHolder(val binding: ItemTransformBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
+        val imageView: ImageView? = binding.imageViewItemTransform
+        val textView: TextView? = binding.textViewItemTransform
+
+        fun showDetailsDialog(text: String, drawable: Int) {
+            val dialogView = LayoutInflater.from(itemView.context).inflate(R.layout.dialog_details, null)
+
+            val avatarView = dialogView.findViewById<ImageView>(R.id.dialog_avatar)
+            val titleView = dialogView.findViewById<TextView>(R.id.dialog_title)
+            val descriptionView = dialogView.findViewById<TextView>(R.id.dialog_description)
+
+            avatarView.setImageResource(drawable)
+            titleView.text = text
+            descriptionView.text = "Descrição do ingrediente"
+
+            AlertDialog.Builder(itemView.context)
+                .setView(dialogView)
+                .setPositiveButton("Fechar") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
+        }
+    }
+
+    class TransformAdapter : ListAdapter<String, TransformViewHolder>(
+        object : DiffUtil.ItemCallback<String>() {
             override fun areItemsTheSame(oldItem: String, newItem: String): Boolean =
                 oldItem == newItem
 
             override fun areContentsTheSame(oldItem: String, newItem: String): Boolean =
                 oldItem == newItem
-        }) {
-
+        }
+    ) {
         private val drawables = listOf(
             R.drawable.avatar_1,
             R.drawable.avatar_2,
@@ -71,26 +96,25 @@ class IngredientesFragment : Fragment() {
             R.drawable.avatar_13,
             R.drawable.avatar_14,
             R.drawable.avatar_15,
-            R.drawable.avatar_16,
+            R.drawable.avatar_16
         )
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransformViewHolder {
-            val binding = ItemTransformBinding.inflate(LayoutInflater.from(parent.context))
+            val binding = ItemTransformBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             return TransformViewHolder(binding)
         }
 
         override fun onBindViewHolder(holder: TransformViewHolder, position: Int) {
-            holder.textView.text = getItem(position)
-            holder.imageView.setImageDrawable(
-                ResourcesCompat.getDrawable(holder.imageView.resources, drawables[position], null)
-            )
+            holder.textView?.text = getItem(position)
+            holder.imageView?.let { imageView ->
+                ResourcesCompat.getDrawable(imageView.resources, drawables[position], null)?.let { drawable ->
+                    imageView.setImageDrawable(drawable)
+                }
+            }
+
+            holder.binding.buttonDetails?.setOnClickListener {
+                holder.showDetailsDialog(getItem(position), drawables[position])
+            }
         }
-    }
-
-    class TransformViewHolder(binding: ItemTransformBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-
-        val imageView: ImageView = binding.imageViewItemTransform!!
-        val textView: TextView = binding.textViewItemTransform!!
     }
 }
