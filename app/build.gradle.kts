@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "pt.utad.refresh"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 35
 
         val commitCount = "git rev-list --count HEAD".runCommand()?.trim()?.toIntOrNull() ?: 1
