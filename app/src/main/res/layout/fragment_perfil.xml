@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/login_gradient"
-        tools:context=".ui.perfil.SlideshowFragment">
+        tools:context=".ui.perfil.PerfilFragment">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/profile_image"
@@ -168,7 +168,8 @@
                     android:textSize="16sp"
                     android:clickable="true"
                     android:focusable="true"
-                    android:padding="8dp" />
+                    android:padding="8dp"
+                    android:background="?attr/selectableItemBackgroundBorderless" />
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

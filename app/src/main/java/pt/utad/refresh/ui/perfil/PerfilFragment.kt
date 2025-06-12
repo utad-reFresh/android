@@ -1,9 +1,11 @@
 package pt.utad.refresh.ui.perfil
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -15,8 +17,10 @@ import pt.utad.refresh.databinding.FragmentPerfilBinding
 import pt.utad.refresh.ApiClient
 import pt.utad.refresh.ApiService
 import kotlinx.coroutines.launch
+import pt.utad.refresh.LoginActivity
+import pt.utad.refresh.SessionManager
 
-class SlideshowViewModelFactory(
+class PerfilViewModelFactory(
     private val apiService: ApiService
 ) : ViewModelProvider.Factory {
     override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
@@ -28,7 +32,7 @@ class SlideshowViewModelFactory(
     }
 }
 
-class SlideshowFragment : Fragment() {
+class PerfilFragment : Fragment() {
     private var _binding: FragmentPerfilBinding? = null
     private val binding get() = _binding!!
     private lateinit var viewModel: PerfilViewModel
@@ -53,7 +57,7 @@ class SlideshowFragment : Fragment() {
         _binding = FragmentPerfilBinding.inflate(inflater, container, false)
 
         val apiService = ApiClient.apiService
-        val factory = SlideshowViewModelFactory(apiService)
+        val factory = PerfilViewModelFactory(apiService)
         viewModel = ViewModelProvider(this, factory)[PerfilViewModel::class.java]
 
         setupUI()
@@ -71,6 +75,15 @@ class SlideshowFragment : Fragment() {
         var selectedPhotoUri: android.net.Uri? = null
         var photoRemoved = false
         var changeMade = false
+
+        val logoutText = binding.logoutText
+        logoutText.setOnClickListener {
+            SessionManager(requireContext()).clearSession()
+            // Redirect to login
+            val intent = Intent(requireContext(), LoginActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+        }
 
         binding.profileImage.setOnClickListener {
             getContent.launch("image/*")
