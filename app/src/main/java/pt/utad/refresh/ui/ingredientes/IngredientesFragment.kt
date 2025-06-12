@@ -1,5 +1,5 @@
 package pt.utad.refresh.ui.ingredientes
-
+import androidx.fragment.app.FragmentActivity
 import android.os.Bundle
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -15,6 +15,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.res.ResourcesCompat
@@ -128,22 +129,58 @@ class IngredientesFragment : Fragment() {
         val textView: TextView? = binding.textViewItemTransform
 
         fun showDetailsDialog(text: String, drawable: Int) {
+            val dialog = AlertDialog.Builder(itemView.context, R.style.FullScreenDialog)
+                .create()
+
             val dialogView = LayoutInflater.from(itemView.context).inflate(R.layout.dialog_details, null)
 
+            // Inicializar views
             val avatarView = dialogView.findViewById<ImageView>(R.id.dialog_avatar)
             val titleView = dialogView.findViewById<TextView>(R.id.dialog_title)
-            val descriptionView = dialogView.findViewById<TextView>(R.id.dialog_description)
+            val quantidadeField = dialogView.findViewById<TextInputEditText>(R.id.edtQuantidade)
+            val validadeField = dialogView.findViewById<TextInputEditText>(R.id.edtValidade)
+            val deleteButton = dialogView.findViewById<MaterialButton>(R.id.button_delete)
+            val closeButton = dialogView.findViewById<MaterialButton>(R.id.close_button)
 
+            // Configurar views
             avatarView.setImageResource(drawable)
             titleView.text = text
-            descriptionView.text = "Descrição do ingrediente"
 
-            AlertDialog.Builder(itemView.context)
-                .setView(dialogView)
-                .setPositiveButton("Fechar") { dialog, _ ->
-                    dialog.dismiss()
+            // Definir valores placeholder
+            quantidadeField.setText("500g")
+            validadeField.setText("31/12/2024")
+
+            // Configurar campo de validade como date picker
+            validadeField.setOnClickListener {
+                val datePicker = MaterialDatePicker.Builder.datePicker()
+                    .setTitleText("Selecione a data de validade")
+                    .build()
+
+                datePicker.addOnPositiveButtonClickListener { selection ->
+                    val dateFormatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                    validadeField.setText(dateFormatter.format(selection))
                 }
-                .show()
+
+                datePicker.show((itemView.context as FragmentActivity).supportFragmentManager, "DATE_PICKER")
+            }
+
+            // Configurar botões
+            deleteButton.setOnClickListener {
+                // Implementar lógica de deleção
+                dialog.dismiss()
+            }
+
+            closeButton.setOnClickListener {
+                dialog.dismiss()
+            }
+
+            // Configurar dialog
+            dialog.setView(dialogView)
+            dialog.window?.apply {
+                setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            }
+            dialog.show()
         }
     }
 
