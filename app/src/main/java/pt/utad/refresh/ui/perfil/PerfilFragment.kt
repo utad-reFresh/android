@@ -87,7 +87,7 @@ class SlideshowFragment : Fragment() {
             binding.profileName.text = profile.displayName
             binding.emailField.setText(profile.email)
             Glide.with(this)
-                .load(profile.photoUrl)
+                .load(ApiClient.BASE_URL + profile.photoUrl)
                 .placeholder(R.drawable.account_circle_40px)
                 .into(binding.profileImage)
         }

@@ -7,7 +7,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 
 object ApiClient {
-    private const val BASE_URL = "https://refresh.jestev.es/api/"
+    const val BASE_URL = "https://refresh.jestev.es/"
+    const val API_URL = BASE_URL + "api/"
     lateinit var apiService: ApiService
 
     fun init(sessionManager: SessionManager) {
@@ -21,7 +22,7 @@ object ApiClient {
             .build()
 
         val retrofit = Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(API_URL)
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
