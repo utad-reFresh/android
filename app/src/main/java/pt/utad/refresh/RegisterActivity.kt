@@ -3,6 +3,7 @@ package pt.utad.refresh
 import android.os.Bundle
 import android.widget.Toast
 import android.content.Intent
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.textfield.TextInputLayout
@@ -15,6 +16,7 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var tilPassword: TextInputLayout
     private lateinit var tilConfirmPassword: TextInputLayout
     private lateinit var btnRegister: MaterialButton
+    private lateinit var tvLogin: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,6 +32,7 @@ class RegisterActivity : AppCompatActivity() {
         tilPassword = findViewById(R.id.tilPassword)
         tilConfirmPassword = findViewById(R.id.tilConfirmPassword)
         btnRegister = findViewById(R.id.btnRegister)
+        tvLogin = findViewById(R.id.tvLogin)
     }
 
     private fun setupListeners() {
@@ -37,6 +40,10 @@ class RegisterActivity : AppCompatActivity() {
             if (validateInputs()) {
                 performRegister()
             }
+        }
+        tvLogin.setOnClickListener {
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
         }
     }
 
@@ -114,4 +121,3 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 }
-
