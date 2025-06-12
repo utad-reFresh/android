@@ -12,7 +12,8 @@
     <string name="menu_slideshow">Slideshow</string>
     <string name="menu_settings">Settings</string>
     <string name="delete_button">Apagar</string>
-
+    <string name="details_button">Detalhes</string>
+    <string name="favorite_button">Favoritar</string>
 
     <string name="lorem_ipsum_title">Lorem Ipsum"</string>
     <string name="lorem_ipsum">Lorem Ipsum is simply placeholder text of the printing and
