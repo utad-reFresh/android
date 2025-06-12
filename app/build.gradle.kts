@@ -29,12 +29,16 @@ android {
             storePassword = (System.getenv("RELEASE_STORE_PASSWORD") ?: project.property("RELEASE_STORE_PASSWORD")).toString()
             keyAlias = (System.getenv("RELEASE_KEY_ALIAS") ?: project.property("RELEASE_KEY_ALIAS")).toString()
             keyPassword = (System.getenv("RELEASE_KEY_PASSWORD") ?: project.property("RELEASE_KEY_PASSWORD")).toString()
+            enableV1Signing = true
+            enableV2Signing = true
         }
+
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
