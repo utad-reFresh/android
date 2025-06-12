@@ -33,7 +33,8 @@ import com.bumptech.glide.Glide
 import androidx.camera.core.Camera
 import androidx.camera.core.FocusMeteringAction
 import pt.utad.refresh.R
-
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.textfield.TextInputEditText
 
 class ScannerFragment : Fragment() {
     private var _binding: FragmentScannerBinding? = null
@@ -43,7 +44,6 @@ class ScannerFragment : Fragment() {
     private var isHandlingResult = false
     private var camera: Camera? = null
     private var flashEnabled = false
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -65,7 +65,6 @@ class ScannerFragment : Fragment() {
         cameraExecutor = Executors.newSingleThreadExecutor()
         return binding.root
     }
-
 
     @androidx.annotation.OptIn(ExperimentalGetImage::class)
     private fun startCamera() {
@@ -162,12 +161,11 @@ class ScannerFragment : Fragment() {
                     )
                 }
 
-                } catch (e: Exception) {
+            } catch (e: Exception) {
                 e.printStackTrace()
             }
         }, ContextCompat.getMainExecutor(requireContext()))
     }
-
 
     private fun fetchProduct(
         barcode: String,
@@ -223,30 +221,74 @@ class ScannerFragment : Fragment() {
         broadCategory: String?,
         onDismiss: () -> Unit
     ) {
-        val context = requireContext()
-        val layout = LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(32, 32, 32, 32)
-        }
-        val nameView = TextView(context).apply { text = "Name: $name" }
-        val brandView = TextView(context).apply { text = "Brand: $brand" }
-        val genericView = TextView(context).apply { text = "Type: ${genericName ?: broadCategory ?: "Unknown"}" }
-        val imageView = ImageView(context)
-        if (!imageUrl.isNullOrEmpty()) {
-            Glide.with(context).load(imageUrl).into(imageView)
-        }
-        layout.addView(nameView)
-        layout.addView(brandView)
-        layout.addView(genericView)
-        layout.addView(imageView)
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_product_details, null)
 
-        AlertDialog.Builder(context)
-            .setTitle("Confirm Product")
-            .setView(layout)
-            .setPositiveButton("Confirm") { _, _ -> onDismiss() }
-            .setNegativeButton("Cancel") { _, _ -> onDismiss() }
-            .setOnCancelListener { onDismiss() }
-            .show()
+        dialogView.findViewById<TextInputEditText>(R.id.productName).setText("$name")
+        dialogView.findViewById<TextInputEditText>(R.id.productBrand).setText("$brand")
+        dialogView.findViewById<TextInputEditText>(R.id.productType).setText(
+            genericName ?: broadCategory ?: "Desconhecido"
+        )
+
+        if (!imageUrl.isNullOrEmpty()) {
+            Glide.with(requireContext())
+                .load(imageUrl)
+                .into(dialogView.findViewById(R.id.productImage))
+        }
+
+        val dialog = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog)
+            .setView(dialogView)
+            .setCancelable(false)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        dialogView.findViewById<MaterialButton>(R.id.btnConfirm).setOnClickListener {
+            dialog.dismiss()
+            showIngredientDetailsDialog(name, brand, imageUrl)
+        }
+
+        dialogView.findViewById<MaterialButton>(R.id.btnCancel).setOnClickListener {
+            dialog.dismiss()
+            startCamera() // Reinicia a câmera apenas quando cancelar
+            onDismiss()
+        }
+
+        dialog.show()
+    }
+
+    private fun showIngredientDetailsDialog(name: String?, brand: String?, imageUrl: String?) {
+        val dialogView = LayoutInflater.from(requireContext())
+            .inflate(R.layout.dialog_adicionar_ingrediente, null)
+
+        dialogView.findViewById<TextView>(R.id.txtIngrediente).text = name ?: "Produto"
+
+        if (!imageUrl.isNullOrEmpty()) {
+            Glide.with(requireContext())
+                .load(imageUrl)
+                .into(dialogView.findViewById(R.id.ingredient_image))
+        }
+
+        val dialog = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog)
+            .setView(dialogView)
+            .setCancelable(false)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        dialogView.findViewById<MaterialButton>(R.id.save_button).setOnClickListener {
+            val quantidade = dialogView.findViewById<TextInputEditText>(R.id.edtQuantidade).text.toString()
+            val validade = dialogView.findViewById<TextInputEditText>(R.id.edtValidade).text.toString()
+
+            dialog.dismiss()
+            startCamera() // Reinicia a câmera apenas após salvar
+        }
+
+        dialogView.findViewById<TextView>(R.id.back_text).setOnClickListener {
+            dialog.dismiss()
+            showProductDialog(name, brand, imageUrl, null, null) {}
+        }
+
+        dialog.show()
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
