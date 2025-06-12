@@ -28,6 +28,14 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfigs {
+                create("release") {
+                    storeFile = file(System.getenv("RELEASE_STORE_FILE") ?: project.property("RELEASE_STORE_FILE").toString())
+                    storePassword = (System.getenv("RELEASE_STORE_PASSWORD") ?: project.property("RELEASE_STORE_PASSWORD")).toString()
+                    keyAlias = (System.getenv("RELEASE_KEY_ALIAS") ?: project.property("RELEASE_KEY_ALIAS")).toString()
+                    keyPassword = (System.getenv("RELEASE_KEY_PASSWORD") ?: project.property("RELEASE_KEY_PASSWORD")).toString()
+                }
+            }
         }
     }
     compileOptions {
