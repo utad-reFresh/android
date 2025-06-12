@@ -15,6 +15,7 @@ import pt.utad.refresh.databinding.FragmentPerfilBinding
 import pt.utad.refresh.ApiClient
 import pt.utad.refresh.ApiService
 import kotlinx.coroutines.launch
+import kotlin.text.clear
 
 class SlideshowViewModelFactory(
     private val apiService: ApiService
@@ -33,7 +34,7 @@ class SlideshowFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var viewModel: PerfilViewModel
 
-    private val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: android.net.Uri? ->
+    private var getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: android.net.Uri? ->
         uri?.let {
             binding.profileImage.setImageURI(it)
             lifecycleScope.launch {
@@ -68,16 +69,74 @@ class SlideshowFragment : Fragment() {
     }
 
     private fun setupUI() {
+        var selectedPhotoUri: android.net.Uri? = null
+        var photoRemoved = false
+        var changeMade = false
+
         binding.profileImage.setOnClickListener {
             getContent.launch("image/*")
         }
 
+        binding.changePhotoButton.setOnClickListener {
+            getContent.launch("image/*")
+        }
+
+        binding.removePhotoButton.setOnClickListener {
+            selectedPhotoUri = null
+            photoRemoved = true
+            binding.profileImage.setImageResource(R.drawable.account_circle_40px)
+        }
+
+        getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: android.net.Uri? ->
+            uri?.let {
+                selectedPhotoUri = it
+                photoRemoved = false
+                binding.profileImage.setImageURI(it)
+            }
+        }
+
         binding.saveButton.setOnClickListener {
+            val currentProfile = viewModel.userProfile.value
+            val newName = binding.nameField.text.toString()
+            val currentPassword = binding.currentPasswordField.text.toString()
+            val newPassword = binding.newPasswordField.text.toString()
+
             lifecycleScope.launch {
-                viewModel.updateProfile(
-                    binding.profileName.text.toString(),
-                    viewModel.userProfile.value?.photoUrl ?: ""
-                )
+                // Change display name if needed
+                if (currentProfile != null && newName.isNotBlank() && newName != currentProfile.displayName) {
+                    viewModel.changeDisplayName(newName)
+                    changeMade = true
+                }
+
+                // Change photo if a new photo was selected
+                if (selectedPhotoUri != null) {
+                    viewModel.changePhoto(requireContext(), selectedPhotoUri!!)
+                    changeMade = true
+                }
+
+                // Remove photo if requested
+                if (photoRemoved) {
+                    viewModel.removePhoto()
+                    changeMade = true
+                }
+
+                // Change password if both fields are filled
+                if (currentPassword.isNotBlank() && newPassword.isNotBlank()
+                    && currentProfile != null
+                    && currentProfile.email.isNotBlank()
+                    && context != null) {
+                    viewModel.changePasswordAndReAuth(context, currentProfile.email, currentPassword, newPassword)
+                    changeMade = true
+                } else if (newPassword.isNotBlank() && currentPassword.isBlank()) {
+                    Toast.makeText(context, "Preencha ambos os campos de senha", Toast.LENGTH_SHORT).show()
+                }
+
+                if (!changeMade) {
+                    Toast.makeText(context, "Nenhuma alteração feita", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "Perfil atualizado com sucesso", Toast.LENGTH_SHORT).show()
+                }
+
             }
         }
     }
@@ -95,6 +154,17 @@ class SlideshowFragment : Fragment() {
         viewModel.error.observe(viewLifecycleOwner) { error ->
             Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
         }
+
+        viewModel.passwordChanged.observe(viewLifecycleOwner) { changed ->
+            if (changed == true) {
+                Toast.makeText(context, "Password changed successfully", Toast.LENGTH_SHORT).show()
+                binding.currentPasswordField.text?.clear()
+                binding.newPasswordField.text?.clear()
+                binding.currentPasswordField.clearFocus()
+                binding.newPasswordField.clearFocus()
+            }
+        }
+
     }
 
     override fun onDestroyView() {

@@ -12,6 +12,10 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
 import androidx.appcompat.app.AppCompatActivity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import pt.utad.refresh.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -32,6 +36,27 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
             return
+        }
+
+        // se tiver token, verifica se é válido com o /me
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = ApiClient.apiService.getProfile()
+                if (!response.isSuccessful && response.code() == 401) {
+                    withContext(Dispatchers.Main) {
+                        sessionManager.clearSession()
+                        startActivity(Intent(this@MainActivity, LoginActivity::class.java))
+                        finish()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    sessionManager.clearSession()
+                    startActivity(Intent(this@MainActivity, LoginActivity::class.java))
+                    finish()
+                }
+            }
         }
 
         binding = ActivityMainBinding.inflate(layoutInflater)
