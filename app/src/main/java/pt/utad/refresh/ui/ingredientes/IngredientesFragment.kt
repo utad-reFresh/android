@@ -1,6 +1,16 @@
 package pt.utad.refresh.ui.ingredientes
 
 import android.os.Bundle
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.snackbar.Snackbar
+import java.text.SimpleDateFormat
+import java.util.Locale
+import de.hdodenhof.circleimageview.CircleImageView
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,8 +21,10 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.textfield.TextInputEditText
 import pt.utad.refresh.R
 import pt.utad.refresh.databinding.FragmentIngredientesBinding
 import pt.utad.refresh.databinding.ItemTransformBinding
@@ -40,9 +52,73 @@ class IngredientesFragment : Fragment() {
         return root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.titleIngredients?.setOnClickListener {
+            mostrarDialogAdicionar()
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun mostrarDialogAdicionar() {
+        val dialog = AlertDialog.Builder(requireContext(), R.style.FullScreenDialog)
+            .create()
+
+        val dialogView = layoutInflater.inflate(R.layout.dialog_adicionar_ingrediente, null)
+
+        // Inicializar views
+        val ingredientImage = dialogView.findViewById<CircleImageView>(R.id.ingredient_image)
+        val txtIngrediente = dialogView.findViewById<TextView>(R.id.txtIngrediente)
+        val edtQuantidade = dialogView.findViewById<TextInputEditText>(R.id.edtQuantidade)
+        val edtValidade = dialogView.findViewById<TextInputEditText>(R.id.edtValidade)
+        val btnSalvar = dialogView.findViewById<MaterialButton>(R.id.save_button)
+
+        // Configurar campo de validade como date picker
+        edtValidade.setOnClickListener {
+            val datePicker = MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Selecione a data de validade")
+                .build()
+
+            datePicker.addOnPositiveButtonClickListener { selection ->
+                val dateFormatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                edtValidade.setText(dateFormatter.format(selection))
+            }
+
+            datePicker.show(parentFragmentManager, "DATE_PICKER")
+        }
+
+        // Permitir selecionar imagem ao clicar
+        ingredientImage.setOnClickListener {
+            // Implementar lógica para selecionar imagem
+            // Por exemplo, abrir galeria ou câmera
+        }
+
+        // Configurar botão de salvar
+        btnSalvar.setOnClickListener {
+            val ingrediente = txtIngrediente.text.toString()
+            val quantidade = edtQuantidade.text.toString()
+            val validade = edtValidade.text.toString()
+
+            if (quantidade.isNotEmpty() && validade.isNotEmpty()) {
+                // Implementar lógica para salvar os dados
+                dialog.dismiss()
+            } else {
+                Snackbar.make(dialogView, "Preencha todos os campos", Snackbar.LENGTH_SHORT).show()
+            }
+        }
+
+        // Configurar dialog
+        dialog.setView(dialogView)
+        dialog.window?.apply {
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        }
+        dialog.show()
     }
 
     class TransformViewHolder(val binding: ItemTransformBinding) :
