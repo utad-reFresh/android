@@ -1,5 +1,11 @@
 package pt.utad.refresh.ui.receitas
 
+import android.app.Dialog
+import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.view.Window
+import com.google.android.material.button.MaterialButton
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -81,6 +87,35 @@ class ReceitasFragment : Fragment() {
             holder.imageView.setImageDrawable(
                 ResourcesCompat.getDrawable(holder.imageView.resources, receitasImages[position], null)
             )
+
+            holder.itemView.setOnClickListener {
+                mostrarDialogReceita(holder.itemView.context, getItem(position), receitasImages[position])
+            }
+        }
+
+        private fun mostrarDialogReceita(context: Context, nome: String, imagem: Int) {
+            val dialog = Dialog(context)
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            dialog.setContentView(R.layout.dialog_receita)
+
+            val window = dialog.window
+            window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+            val receitaImage = dialog.findViewById<ImageView>(R.id.receita_image)
+            val receitaNome = dialog.findViewById<TextView>(R.id.receita_nome)
+            val receitaDetalhes = dialog.findViewById<TextView>(R.id.receita_detalhes)
+            val fecharButton = dialog.findViewById<MaterialButton>(R.id.fechar_button)
+
+            receitaImage.setImageDrawable(ResourcesCompat.getDrawable(context.resources, imagem, null))
+            receitaNome.text = nome
+            receitaDetalhes.text = "Detalhes da receita ${nome}..."
+
+            fecharButton.setOnClickListener {
+                dialog.dismiss()
+            }
+
+            dialog.show()
         }
     }
 
