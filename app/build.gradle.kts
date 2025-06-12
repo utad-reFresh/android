@@ -11,13 +11,15 @@ android {
         applicationId = "pt.utad.refresh"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        val commitCount = "git rev-list --count HEAD".runCommand()?.trim()?.toIntOrNull() ?: 1
+        versionCode = commitCount
 
         val gitHash = "git rev-parse --short HEAD".runCommand()?.trim() ?: "unknown"
         buildConfigField("String", "GIT_HASH", "\"$gitHash\"")
+        versionName = gitHash
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
     }
 
