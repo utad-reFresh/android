@@ -5,9 +5,12 @@ import pt.utad.refresh.ui.perfil.PerfilViewModel
 import retrofit2.http.POST
 import retrofit2.http.Body
 import retrofit2.Response
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.Part
+import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ApiService {
     @POST("Account/register")
@@ -34,4 +37,51 @@ interface ApiService {
 
     @POST("Account/removePhoto")
     suspend fun removePhoto(): Response<Unit>
+
+    @POST("Account/me/ingredient/{ingredientId}")
+    suspend fun addOrUpdateIngredient(
+        @Path("ingredientId") ingredientId: Int,
+        @Body request: UpdateIngredientRequest
+    ): Response<Unit>
+
+    @DELETE("Account/me/ingredient/{ingredientId}")
+    suspend fun deleteIngredient(
+        @Path("ingredientId") ingredientId: Int
+    ): Response<Unit>
+
+    @GET("Account/me/ingredient/{ingredientId}")
+    suspend fun getIngredient(
+        @Path("ingredientId") ingredientId: Int
+    ): Response<IngredientResponse>
+
+    @GET("Account/me/ingredients")
+    suspend fun getIngredients(): Response<List<IngredientResponse>>
+
+    @GET("Recipe/{id}")
+    suspend fun getRecipe(
+        @Path("id") id: Int
+    ): Response<RecipeResponse>
+
+    @GET("Recipe/search")
+    suspend fun searchRecipes(
+        @Query("query") query: String?
+    ): Response<List<RecipeResponse>>
+
+    @GET("Recipe/ingredients")
+    suspend fun getRecipeIngredients(): Response<List<IngredientResponse>>
+
+    @GET("Recipe/search-ingredients")
+    suspend fun searchIngredients(
+        @Query("query") query: String?
+    ): Response<List<IngredientResponse>>
+
 }
+
+data class IngredientDto(
+    val id: Int,
+    val name: String,
+    val imageUrl: String,
+    val quantity: Int,
+    val isFavorite: Boolean,
+    val expirationDate: String
+)
