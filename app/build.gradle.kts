@@ -15,6 +15,10 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val gitHash = "git rev-parse --short HEAD".runCommand()?.trim() ?: "unknown"
+        buildConfigField("String", "GIT_HASH", "\"$gitHash\"")
+
     }
 
     buildTypes {
@@ -36,6 +40,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 }
 
@@ -68,3 +73,15 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.kotlinx.coroutines.android)
 }
+
+fun String.runCommand(): String? =
+    try {
+        ProcessBuilder(*split(" ").toTypedArray())
+            .redirectErrorStream(true)
+            .start()
+            .inputStream
+            .bufferedReader()
+            .readText()
+    } catch (e: Exception) {
+        null
+    }

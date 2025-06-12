@@ -174,5 +174,18 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <TextView
+            android:id="@+id/text_commit_hash"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="reFresh"
+            android:textSize="15sp"
+            android:textColor="@color/white"
+            android:layout_marginBottom="8dp"
+            android:layout_gravity="center_horizontal|bottom"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>
