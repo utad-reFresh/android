@@ -107,6 +107,8 @@ class IngredientesFragment : Fragment() {
         val dialog = AlertDialog.Builder(requireContext(), R.style.FullScreenDialog).create()
         val dialogView = layoutInflater.inflate(R.layout.dialog_pesquisa, null)
         val edtPesquisa = dialogView.findViewById<TextInputEditText>(R.id.edtPesquisa)
+        val cancelButton = dialogView.findViewById<MaterialButton>(R.id.btnCancel)  // Adicionar esta linha
+
         val nextButton = dialogView.findViewById<MaterialButton>(R.id.next_button)
         val recyclerView = dialogView.findViewById<RecyclerView>(R.id.recyclerViewResults)
 
@@ -130,6 +132,10 @@ class IngredientesFragment : Fragment() {
         }
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        cancelButton.setOnClickListener {
+            dialog.dismiss()
+        }
 
         nextButton.setOnClickListener {
             val pesquisa = edtPesquisa.text.toString()
@@ -166,7 +172,6 @@ class IngredientesFragment : Fragment() {
     private fun mostrarDialogAdicionar(selectedIngredient: IngredientDto) {
         val dialog = AlertDialog.Builder(requireContext(), R.style.FullScreenDialog).create()
         val dialogView = layoutInflater.inflate(R.layout.dialog_adicionar_ingrediente, null)
-
         val ingredientImage = dialogView.findViewById<CircleImageView>(R.id.ingredient_image)
         val txtIngrediente = dialogView.findViewById<TextView>(R.id.txtIngrediente)
         val edtQuantidade = dialogView.findViewById<TextInputEditText>(R.id.edtQuantidade)
@@ -195,6 +200,7 @@ class IngredientesFragment : Fragment() {
             dialog.dismiss()
             mostrarDialogPesquisa()
         }
+
 
         btnSalvar.setOnClickListener {
             val quantidade = edtQuantidade.text.toString()

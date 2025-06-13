@@ -4,7 +4,7 @@
         <shape android:shape="rectangle">
             <stroke
                 android:width="2dp"
-                android:color="#4D2196F3" />
+                android:color="#4CAF50" />
             <corners android:radius="20dp" />
         </shape>
     </item>
@@ -14,8 +14,8 @@
         <shape android:shape="rectangle">
             <size android:width="50dp" android:height="6dp" />
             <gradient
-                android:endColor="#2196F3"
-                android:startColor="#2196F3" />
+                android:endColor="#4CAF50"
+                android:startColor="#4CAF50" />
         </shape>
     </item>
 
@@ -23,8 +23,8 @@
         <shape android:shape="rectangle">
             <size android:width="6dp" android:height="50dp" />
             <gradient
-                android:endColor="#2196F3"
-                android:startColor="#2196F3" />
+                android:endColor="#4CAF50"
+                android:startColor="#4CAF50" />
         </shape>
     </item>
 
@@ -32,8 +32,8 @@
         <shape android:shape="rectangle">
             <size android:width="50dp" android:height="6dp" />
             <gradient
-                android:startColor="#2196F3"
-                android:endColor="#2196F3" />
+                android:startColor="#4CAF50"
+                android:endColor="#4CAF50" />
         </shape>
     </item>
 
@@ -41,8 +41,8 @@
         <shape android:shape="rectangle">
             <size android:width="6dp" android:height="50dp" />
             <gradient
-                android:endColor="#2196F3"
-                android:startColor="#2196F3" />
+                android:endColor="#4CAF50"
+                android:startColor="#4CAF50" />
         </shape>
     </item>
 
@@ -51,8 +51,8 @@
         <shape android:shape="rectangle">
             <size android:width="50dp" android:height="6dp" />
             <gradient
-                android:startColor="#2196F3"
-                android:endColor="#2196F3" />
+                android:startColor="#4CAF50"
+                android:endColor="#4CAF50" />
         </shape>
     </item>
 
@@ -60,8 +60,8 @@
         <shape android:shape="rectangle">
             <size android:width="6dp" android:height="50dp" />
             <gradient
-                android:startColor="#2196F3"
-                android:endColor="#2196F3" />
+                android:startColor="#4CAF50"
+                android:endColor="#4CAF50" />
         </shape>
     </item>
 
@@ -69,8 +69,8 @@
         <shape android:shape="rectangle">
             <size android:width="50dp" android:height="6dp" />
             <gradient
-                android:endColor="#2196F3"
-                android:startColor="#2196F3" />
+                android:endColor="#4CAF50"
+                android:startColor="#4CAF50" />
         </shape>
     </item>
 
@@ -78,8 +78,8 @@
         <shape android:shape="rectangle">
             <size android:width="6dp" android:height="50dp" />
             <gradient
-                android:startColor="#2196F3"
-                android:endColor="#2196F3" />
+                android:startColor="#4CAF50"
+                android:endColor="#4CAF50" />
         </shape>
     </item>
 </layer-list>

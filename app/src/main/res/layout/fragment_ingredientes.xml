@@ -11,8 +11,8 @@
 
     <ImageView
         android:id="@+id/ivIngredients"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:layout_marginTop="32dp"
         android:src="@mipmap/ic_launcher"
         android:elevation="4dp"
@@ -59,10 +59,10 @@
         android:layout_marginHorizontal="24dp"
         android:layout_marginBottom="24dp"
         android:padding="15dp"
+        android:backgroundTint="?attr/colorSurface"
+        android:textColor="?attr/colorOnSurface"
         android:text="Adicionar"
         android:textSize="16sp"
-        android:textColor="?android:attr/textColorSecondary"
-        android:backgroundTint="@android:color/white"
         app:cornerRadius="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
