@@ -27,12 +27,13 @@
         android:text="Nome do Ingrediente"
         android:maxLines="1"
         android:ellipsize="end"
-        app:layout_constraintWidth_default="wrap"
-        app:layout_constraintHorizontal_weight="1"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:gravity="start|center_vertical"
         app:layout_constraintStart_toEndOf="@id/image_view_item_transform"
         app:layout_constraintEnd_toStartOf="@id/layout_buttons"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintWidth_default="spread"
+        app:layout_constraintHorizontal_weight="1"/>
 
     <LinearLayout
         android:id="@+id/layout_buttons"

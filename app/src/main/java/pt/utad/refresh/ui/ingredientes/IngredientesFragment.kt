@@ -49,6 +49,7 @@ class IngredientesFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var ingredientesViewModel: IngredientesViewModel
 
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -66,21 +67,44 @@ class IngredientesFragment : Fragment() {
         recyclerView.adapter = adapter
 
         ingredientesViewModel.ingredients.observe(viewLifecycleOwner) { ingredientList ->
-            // ingredientList is List<IngredientResponse>
-            val dtoList = ingredientList.map { response ->
-                IngredientDto(
-                    id = response.id,
-                    name = response.name,
-                    imageUrl = response.imageUrl,
-                    quantity = response.quantity,
-                    isFavorite = response.isFavorite,
-                    expirationDate = response.expirationDate ?: ""
+            val now = System.currentTimeMillis()
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+            val sortedList = ingredientList
+                .map { response ->
+                    IngredientDto(
+                        id = response.id,
+                        name = response.name,
+                        imageUrl = response.imageUrl,
+                        quantity = response.quantity,
+                        isFavorite = response.isFavorite,
+                        expirationDate = response.expirationDate ?: ""
+                    )
+                }
+                .sortedWith(compareByDescending<IngredientDto> { it.isFavorite }
+                    .thenComparator { a, b ->
+                        // Parse expiration dates
+                        val aDate = a.expirationDate.takeIf { it.isNotBlank() }?.let {
+                            try { dateFormat.parse(it)?.time } catch (_: Exception) { null }
+                        }
+                        val bDate = b.expirationDate.takeIf { it.isNotBlank() }?.let {
+                            try { dateFormat.parse(it)?.time } catch (_: Exception) { null }
+                        }
+                        // Expired first, then soonest, then no expiration at the end
+                        when {
+                            aDate == null && bDate == null -> 0
+                            aDate == null -> 1
+                            bDate == null -> -1
+                            aDate < now && bDate < now -> aDate.compareTo(bDate)
+                            aDate < now -> -1
+                            bDate < now -> 1
+                            else -> aDate.compareTo(bDate)
+                        }
+                    }
+                    .thenBy { it.id }
                 )
-            }
-            adapter.submitList(dtoList)
-
-
-            binding.emptyMessage?.visibility = if (dtoList.isEmpty()) View.VISIBLE else View.GONE        }
+            adapter.submitList(sortedList)
+            binding.emptyMessage?.visibility = if (sortedList.isEmpty()) View.VISIBLE else View.GONE
+        }
 
         return root
     }
@@ -185,6 +209,8 @@ class IngredientesFragment : Fragment() {
             .into(ingredientImage)
         txtIngrediente.text = selectedIngredient.name
 
+
+
         edtValidade.setOnClickListener {
             val datePicker = MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Selecione a data de validade")
@@ -271,6 +297,7 @@ class IngredientesFragment : Fragment() {
                 .load(ingredient.imageUrl)
                 .into(avatarView)
             titleView.text = ingredient.name
+
             quantidadeField.setText(ingredient.quantity.toString())
 
             validadeField.setOnClickListener {
@@ -384,15 +411,76 @@ class IngredientesFragment : Fragment() {
                 val binding = ItemTransformBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 return TransformViewHolder(binding)
             }
+            fun parseIsoDate(dateStr: String): Long? {
+                if (dateStr.isBlank()) return null
+                val formats = listOf(
+                    "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+                    "yyyy-MM-dd'T'HH:mm:ss'Z'"
+                )
+                for (pattern in formats) {
+                    try {
+                        val sdf = SimpleDateFormat(pattern, Locale.getDefault())
+                        sdf.timeZone = java.util.TimeZone.getTimeZone("UTC")
+                        return sdf.parse(dateStr)?.time
+                    } catch (_: Exception) {}
+                }
+                return null
+            }
 
             override fun onBindViewHolder(holder: TransformViewHolder, position: Int) {
                 val ingredient = getItem(position)
                 holder.textView?.text = ingredient.name
+
+
+                val now = System.currentTimeMillis()
+                val threeDaysMs = 3 * 24 * 60 * 60 * 1000L
+                val expTime = parseIsoDate(ingredient.expirationDate)
+                val isDanger = expTime != null && expTime - now < threeDaysMs
+
+
+                val dangerColor = ResourcesCompat.getColor(holder.textView!!.resources, R.color.danger_red, null)
+                if (isDanger) {
+                    holder.textView?.setTextColor((dangerColor))
+                }
+
+
                 holder.imageView?.let { imageView ->
                     Glide.with(imageView.context)
                         .load(ingredient.imageUrl)
                         .into(imageView)
                 }
+
+                // Favorite button logic
+                val favoriteButton = holder.binding.buttonFavorite
+
+                if (favoriteButton == null) {
+                    // If the button is not present, we can skip setting it up
+                    return
+                }
+
+                favoriteButton.setImageResource(
+                    if (ingredient.isFavorite) R.drawable.favorite_filled_24px else R.drawable.favorite_24px
+                )
+                favoriteButton.isSelected = ingredient.isFavorite
+
+                favoriteButton.setOnClickListener {
+                    val newFavorite = !ingredient.isFavorite
+                    val expirationDateToSend = ingredient.expirationDate.takeIf { it.isNotBlank() } ?: null
+                    fragment.viewLifecycleOwner.lifecycleScope.launch {
+                        val request = UpdateIngredientRequest(
+                            quantity = ingredient.quantity,
+                            isFavorite = newFavorite,
+                            expirationDate = expirationDateToSend
+                        )
+                        val response = apiService.addOrUpdateIngredient(ingredient.id, request)
+                        if (response.isSuccessful) {
+                            (fragment as? IngredientesFragment)?.let { frag ->
+                                ViewModelProvider(frag)[IngredientesViewModel::class.java].fetchIngredients()
+                            }
+                        }
+                    }
+                }
+
                 holder.binding.buttonDetails?.setOnClickListener {
                     holder.showDetailsDialog(ingredient, apiService, fragment)
                 }

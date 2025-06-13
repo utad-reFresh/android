@@ -11,4 +11,6 @@
     <color name="green_dark">#388E3C</color>
     <color name="green_light">#81C784</color>
     <color name="green_background">#E8F5E9</color>
+    <color name="mtrl_divider_color">#B6B6B6</color>
+    <color name="danger_red">#E53935</color>
 </resources>

@@ -58,33 +58,6 @@ class ReceitasFragment : Fragment() {
         _binding = null
     }
 
-    private fun preencherPassos(container: LinearLayout, passos: List<String>) {
-        container.removeAllViews() // Limpa passos existentes
-
-        passos.forEachIndexed { index, passo ->
-            val textInputLayout = TextInputLayout(container.context).apply {
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                ).apply {
-                    //   setMargins(0, resources.getDimensionPixelSize(R.dimen.margin_8dp), 0, 0)
-                }
-                hint = "Passo ${index + 1}"
-            }
-
-            val editText = TextInputEditText(textInputLayout.context).apply {
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                )
-                setText(passo)
-                isEnabled = false
-            }
-
-            textInputLayout.addView(editText)
-            container.addView(textInputLayout)
-        }
-    }
 
     class ReceitasAdapter :
         ListAdapter<pt.utad.refresh.RecipeInListDto, ReceitasViewHolder>(object : DiffUtil.ItemCallback<pt.utad.refresh.RecipeInListDto>() {
@@ -103,6 +76,9 @@ class ReceitasFragment : Fragment() {
         override fun onBindViewHolder(holder: ReceitasViewHolder, position: Int) {
             val recipe = getItem(position)
             holder.textView.text = recipe.name
+
+
+
             Glide.with(holder.imageView.context)
                 .load(recipe.imageUrl)
                 .placeholder(ResourcesCompat.getDrawable(holder.imageView.resources, R.drawable.egg_alt_24px, null))
@@ -138,8 +114,7 @@ class ReceitasFragment : Fragment() {
             val receitaDetalhes = dialog.findViewById<TextView>(R.id.receita_detalhes)
             val fecharButton = dialog.findViewById<MaterialButton>(R.id.fechar_button)
             val passosContainer = dialog.findViewById<LinearLayout>(R.id.passos_container)
-            //    val passosDaReceita = recipe.passos // Lista de strings com os passos
-            //preencherPassos(passosContainer, passosDaReceita)
+
 
             val chipVegetarian = dialog.findViewById<View>(R.id.chip_vegetarian)
             val chipVegan = dialog.findViewById<View>(R.id.chip_vegan)
@@ -169,21 +144,112 @@ class ReceitasFragment : Fragment() {
                 layoutEquipamentos.visibility = View.GONE
             } else {
                 layoutEquipamentos.visibility = View.VISIBLE
-                editEquipamentos.text = recipe.equipment.joinToString(", ") { it.name }
+                editEquipamentos.text = recipe.equipment.joinToString("\n") { it.name }
             }
 
             // Fill ingredients (comma separated)
             val editIngredientes = dialog.findViewById<TextView>(R.id.edit_ingredientes)
-            editIngredientes.text = recipe.ingredients.joinToString(", ") { it.name }
+            editIngredientes.text = recipe.ingredientDets.joinToString("\n") { ing ->
+                fun formatAmount(amount: Double, unit: String): String =
+                    if (unit.isBlank()) {
+                        if (amount % 1.0 == 0.0) "${amount.toInt()}" else "$amount"
+                    } else {
+                        if (amount % 1.0 == 0.0) "${amount.toInt()} $unit" else "$amount $unit"
+                    }
 
+                val metric = if (ing.amountMetric > 0) formatAmount(ing.amountMetric, ing.unitShortMetric) else null
+                val imperial = if (ing.amountImperial > 0) formatAmount(ing.amountImperial, ing.unitShortImperial) else null
+
+                when {
+                    metric != null && imperial != null && metric == imperial -> "${ing.name} ($metric)"
+                    metric != null && imperial != null -> "${ing.name} ($metric / $imperial)"
+                    metric != null -> "${ing.name} ($metric)"
+                    imperial != null -> "${ing.name} ($imperial)"
+                    else -> ing.name
+                }
+            }
 
             receitaNome.text = recipe.title
-            receitaDetalhes.text = recipe.summary.replace("<[^>]*>".toRegex(), "")
+            receitaDetalhes.text = recipe.summary.replace("<br>", "\n").replace("<[^>]*>".toRegex(), "")
             receitaImage.let {
                 Glide.with(context)
                     .load(recipe.imageUrl)
                     .placeholder(ResourcesCompat.getDrawable(context.resources, R.drawable.egg_alt_24px, null))
                     .into(it)
+            }
+
+
+
+            passosContainer.removeAllViews()
+            val stepMargin = context.resources.getDimensionPixelSize(R.dimen.margin_8dp)
+            val dividerColor = ResourcesCompat.getColor(context.resources, R.color.mtrl_divider_color, null)
+
+            recipe.steps.sortedBy { it.number }.forEachIndexed { idx, stepDto ->
+                val row = LinearLayout(context).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    ).apply {
+                        topMargin = if (idx == 0) 0 else stepMargin / 2
+                    }
+                    gravity = android.view.Gravity.CENTER_VERTICAL
+                }
+
+                val numberView = TextView(context).apply {
+                    text = stepDto.number.toString()
+                    textSize = 18f
+                    setTypeface(typeface, android.graphics.Typeface.BOLD)
+                    gravity = android.view.Gravity.CENTER
+                    layoutParams = LinearLayout.LayoutParams(
+                        context.resources.getDimensionPixelSize(R.dimen.step_number_width),
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
+                    setPadding(0, stepMargin / 2, 0, stepMargin / 2)
+                }
+
+                val textView = TextView(context).apply {
+                    text = stepDto.step
+                    textSize = 16f
+                    layoutParams = LinearLayout.LayoutParams(
+                        0,
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        1f
+                    )
+                }
+
+
+                row.addView(numberView)
+                row.addView(textView)
+                passosContainer.addView(row)
+
+                if (idx < recipe.steps.size - 1) {
+                    val divider = View(context).apply {
+                        setBackgroundColor(dividerColor)
+                        layoutParams = LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            context.resources.getDimensionPixelSize(R.dimen.divider_height)
+                        ).apply {
+                            topMargin = stepMargin / 2
+                            bottomMargin = stepMargin / 2
+                        }
+                    }
+                    passosContainer.addView(divider)
+                }
+            }
+
+            if (recipe.steps.isNullOrEmpty()) {
+                val noStepsView = TextView(context).apply {
+                    text = "Esta receita não disponibiliza modo de preparação"
+                    textSize = 16f
+                    gravity = android.view.Gravity.CENTER
+                    setPadding(0, context.resources.getDimensionPixelSize(R.dimen.margin_8dp), 0, context.resources.getDimensionPixelSize(R.dimen.margin_8dp))
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
+                }
+                passosContainer.addView(noStepsView)
             }
 
             fecharButton.setOnClickListener {
