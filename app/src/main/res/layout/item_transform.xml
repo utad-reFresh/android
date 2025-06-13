@@ -32,17 +32,17 @@
         app:layout_constraintHorizontal_weight="1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/image_view_item_transform"
-        app:layout_constraintEnd_toStartOf="@id/button_details"
+        app:layout_constraintEnd_toStartOf="@id/layout_buttons"
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
+        android:id="@+id/layout_buttons"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="22dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/text_view_item_transform"
         app:layout_constraintTop_toTopOf="parent">
         <ImageButton
             android:id="@+id/button_favorite"
@@ -50,7 +50,8 @@
             android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="8dp"
-            android:src="@drawable/favorite_24px" />
+            android:src="@drawable/favorite_24px"
+            android:contentDescription="Favoritar"/>
 
         <ImageButton
             android:id="@+id/button_details"
@@ -58,11 +59,8 @@
             android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="8dp"
-            android:src="@drawable/info_24px" />
-
-
-
-
+            android:src="@drawable/info_24px"
+            android:contentDescription="Detalhes"/>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

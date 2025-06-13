@@ -26,15 +26,28 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
 import android.app.AlertDialog
+import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.bumptech.glide.Glide
 import androidx.camera.core.Camera
 import androidx.camera.core.FocusMeteringAction
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import pt.utad.refresh.R
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
+import pt.utad.refresh.ApiClient
+import pt.utad.refresh.ApiClient.apiService
+import pt.utad.refresh.IngredientDto
+import pt.utad.refresh.ui.ingredientes.IngredientSearchAdapter
 
 class ScannerFragment : Fragment() {
     private var _binding: FragmentScannerBinding? = null
@@ -105,7 +118,7 @@ class ScannerFragment : Fragment() {
                                             cameraProvider?.unbindAll()
                                             fetchProduct(code) { name, brand, imageUrl, genericName, broadCategory ->
                                                 if (name != null) {
-                                                    showProductDialog(name, brand, imageUrl, genericName, broadCategory) {
+                                                    showProductDialog(name, brand, imageUrl, genericName, broadCategory, code) {
                                                         isHandlingResult = false
                                                         startCamera()
                                                     }
@@ -219,15 +232,14 @@ class ScannerFragment : Fragment() {
         imageUrl: String?,
         genericName: String?,
         broadCategory: String?,
+        barcode: String, // add this
         onDismiss: () -> Unit
     ) {
         val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_product_details, null)
 
         dialogView.findViewById<TextInputEditText>(R.id.productName).setText("$name")
         dialogView.findViewById<TextInputEditText>(R.id.productBrand).setText("$brand")
-        dialogView.findViewById<TextInputEditText>(R.id.productType).setText(
-            genericName ?: broadCategory ?: "Desconhecido"
-        )
+        // Removed the productType/category field
 
         if (!imageUrl.isNullOrEmpty()) {
             Glide.with(requireContext())
@@ -244,19 +256,199 @@ class ScannerFragment : Fragment() {
 
         dialogView.findViewById<MaterialButton>(R.id.btnConfirm).setOnClickListener {
             dialog.dismiss()
-            showIngredientDetailsDialog(name, brand, imageUrl)
+            fetchIngredientsByBarcode(barcode) { ingredients ->
+                // showIngredientsSearch(ingredients)
+                mostrarDialogPesquisaComResultadosIniciais(ingredients)
+            }
+            // showIngredientDetailsDialog(name, brand, imageUrl)
         }
 
         dialogView.findViewById<MaterialButton>(R.id.btnCancel).setOnClickListener {
             dialog.dismiss()
-            startCamera() // Reinicia a câmera apenas quando cancelar
+            startCamera()
             onDismiss()
         }
 
         dialog.show()
     }
 
-    private fun showIngredientDetailsDialog(name: String?, brand: String?, imageUrl: String?) {
+    private fun mostrarDialogAdicionar(selectedIngredient: IngredientDto) {
+        val dialog = AlertDialog.Builder(requireContext(), R.style.FullScreenDialog).create()
+        val dialogView = layoutInflater.inflate(R.layout.dialog_adicionar_ingrediente, null)
+
+        val ingredientImage = dialogView.findViewById<ImageView>(R.id.ingredient_image)
+        val txtIngrediente = dialogView.findViewById<TextView>(R.id.txtIngrediente)
+        val edtQuantidade = dialogView.findViewById<TextInputEditText>(R.id.edtQuantidade)
+        val edtValidade = dialogView.findViewById<TextInputEditText>(R.id.edtValidade)
+        val btnSalvar = dialogView.findViewById<MaterialButton>(R.id.save_button)
+        val backText = dialogView.findViewById<TextView>(R.id.back_text)
+
+        dialog.setOnDismissListener {
+            isHandlingResult = false
+            startCamera()
+        }
+
+        Glide.with(ingredientImage.context)
+            .load(selectedIngredient.imageUrl)
+            .placeholder(R.drawable.egg_40px)
+            .into(ingredientImage)
+        txtIngrediente.text = selectedIngredient.name
+
+        edtValidade.setOnClickListener {
+            val datePicker = com.google.android.material.datepicker.MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Selecione a data de validade")
+                .build()
+            datePicker.addOnPositiveButtonClickListener { selection ->
+                val dateFormatter = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
+                edtValidade.setText(dateFormatter.format(selection))
+            }
+            datePicker.show(parentFragmentManager, "DATE_PICKER")
+        }
+
+        backText.setOnClickListener {
+            dialog.dismiss()
+            // Optionally, reopen the ingredient search dialog
+            // mostrarDialogPesquisaComResultadosIniciais(emptyList())
+        }
+
+        btnSalvar.setOnClickListener {
+            val quantidade = edtQuantidade.text.toString()
+            val validade = edtValidade.text.toString()
+            if (quantidade.isNotEmpty()) {
+                val isoExpiration: String? = if (validade.isNotEmpty()) {
+                    try {
+                        val inputFormat = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
+                        val date = inputFormat.parse(validade)
+                        val isoFormat = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.getDefault())
+                        isoFormat.timeZone = java.util.TimeZone.getTimeZone("UTC")
+                        isoFormat.format(date!!)
+                    } catch (e: Exception) {
+                        null
+                    }
+                } else {
+                    null
+                }
+                lifecycleScope.launch {
+                    val request = pt.utad.refresh.UpdateIngredientRequest(
+                        quantity = quantidade.toInt(),
+                        isFavorite = selectedIngredient.isFavorite,
+                        expirationDate = isoExpiration
+                    )
+                    val response = pt.utad.refresh.ApiClient.apiService.addOrUpdateIngredient(selectedIngredient.id, request)
+                    if (response.isSuccessful) {
+                        dialog.dismiss()
+                        Toast.makeText(requireContext(), "Ingrediente adicionado!", Toast.LENGTH_SHORT).show()
+                        isHandlingResult = false
+                        startCamera()
+                    } else {
+                        Snackbar.make(dialogView, "Erro ao adicionar", Snackbar.LENGTH_SHORT).show()
+                    }
+                }
+            } else {
+                Snackbar.make(dialogView, "Indique a quantidade", Snackbar.LENGTH_SHORT).show()
+            }
+        }
+
+        dialog.setView(dialogView)
+        dialog.window?.apply {
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        }
+        dialog.show()
+    }
+
+    private fun mostrarDialogPesquisaComResultadosIniciais(initialIngredients: List<IngredientDto>) {
+        val dialog = AlertDialog.Builder(requireContext(), R.style.FullScreenDialog).create()
+        val dialogView = layoutInflater.inflate(R.layout.dialog_pesquisa, null)
+        val edtPesquisa = dialogView.findViewById<TextInputEditText>(R.id.edtPesquisa)
+        val nextButton = dialogView.findViewById<MaterialButton>(R.id.next_button)
+        val recyclerView = dialogView.findViewById<RecyclerView>(R.id.recyclerViewResults)
+
+        dialog.setOnDismissListener {
+            isHandlingResult = false
+            startCamera()
+        }
+
+        val adapter = IngredientSearchAdapter { selectedIngredient ->
+            dialog.dismiss()
+            mostrarDialogAdicionar(selectedIngredient)
+        }
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        // Show initial ingredients
+        adapter.submitList(initialIngredients)
+        recyclerView.visibility = if (initialIngredients.isNotEmpty()) View.VISIBLE else View.GONE
+
+        edtPesquisa.setOnEditorActionListener { v, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_SEARCH) {
+                val imm = v.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(v.windowToken, 0)
+                nextButton.performClick()
+                true
+            } else {
+                false
+            }
+        }
+
+        nextButton.setOnClickListener {
+            val pesquisa = edtPesquisa.text.toString()
+            if (pesquisa.isNotEmpty()) {
+                lifecycleScope.launch {
+                    val response = ApiClient.apiService.searchIngredients(pesquisa)
+                    if (response.isSuccessful) {
+                        val results = response.body() ?: emptyList()
+                        val dtoList = results.map { response ->
+                            IngredientDto(
+                                id = response.id,
+                                name = response.name,
+                                imageUrl = response.imageUrl,
+                                quantity = response.quantity,
+                                isFavorite = response.isFavorite,
+                                expirationDate = response.expirationDate ?: ""
+                            )
+                        }
+                        adapter.submitList(dtoList)
+                        recyclerView.visibility = if (dtoList.isNotEmpty()) View.VISIBLE else View.GONE
+                    }
+                }
+            } else {
+                Snackbar.make(dialogView, "Insira o nome do ingrediente, em inglês.", Snackbar.LENGTH_SHORT).show()
+            }
+        }
+
+        dialog.setView(dialogView)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.show()
+    }
+
+    private fun fetchIngredientsByBarcode(barcode: String, onResult: (List<IngredientDto>) -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                // Use your ApiService instance here (e.g., via dependency injection or singleton)
+                val response = apiService.getProductByBarcode(barcode)
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        val product = response.body()
+                        onResult(product?.ingredients ?: emptyList())
+                    } else {
+                        onResult(emptyList())
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) { onResult(emptyList()) }
+            }
+        }
+    }
+
+    private fun showIngredientDetailsDialog(
+        name: String?,
+        brand: String?,
+        imageUrl: String?,
+        genericName: String?,
+        broadCategory: String?,
+        code: String?
+    ) {
         val dialogView = LayoutInflater.from(requireContext())
             .inflate(R.layout.dialog_adicionar_ingrediente, null)
 
@@ -285,7 +477,11 @@ class ScannerFragment : Fragment() {
 
         dialogView.findViewById<TextView>(R.id.back_text).setOnClickListener {
             dialog.dismiss()
-            showProductDialog(name, brand, imageUrl, null, null) {}
+            showProductDialog(name, brand, imageUrl, genericName, broadCategory, code.toString()) {
+                isHandlingResult = false
+                startCamera()
+            }
+
         }
 
         dialog.show()
