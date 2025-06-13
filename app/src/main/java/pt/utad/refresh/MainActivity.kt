@@ -46,8 +46,9 @@ class MainActivity : AppCompatActivity() {
                             .setPositiveButton("Update") { _, _ ->
                                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://refresh.jestev.es/apks/latest.apk"))
                                 startActivity(intent)
+                                finish()
                             }
-                            .setNegativeButton("Continue") { dialog, _ ->
+                            .setNegativeButton("Ignorar") { dialog, _ ->
                                 dialog.dismiss()
                                 continueAppInit()
                             }
