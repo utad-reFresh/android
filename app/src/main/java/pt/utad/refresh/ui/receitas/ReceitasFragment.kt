@@ -18,7 +18,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import pt.utad.refresh.ApiClient
 import pt.utad.refresh.R
+import pt.utad.refresh.RecipeResponse
 import pt.utad.refresh.databinding.FragmentReceitasBinding
 import pt.utad.refresh.databinding.ItemReceitaBinding
 
@@ -50,50 +56,44 @@ class ReceitasFragment : Fragment() {
     }
 
     class ReceitasAdapter :
-        ListAdapter<String, ReceitasViewHolder>(object : DiffUtil.ItemCallback<String>() {
-            override fun areItemsTheSame(oldItem: String, newItem: String): Boolean =
-                oldItem == newItem
+        ListAdapter<pt.utad.refresh.RecipeInListDto, ReceitasViewHolder>(object : DiffUtil.ItemCallback<pt.utad.refresh.RecipeInListDto>() {
+            override fun areItemsTheSame(oldItem: pt.utad.refresh.RecipeInListDto, newItem: pt.utad.refresh.RecipeInListDto): Boolean =
+                oldItem.id == newItem.id
 
-            override fun areContentsTheSame(oldItem: String, newItem: String): Boolean =
+            override fun areContentsTheSame(oldItem: pt.utad.refresh.RecipeInListDto, newItem: pt.utad.refresh.RecipeInListDto): Boolean =
                 oldItem == newItem
         }) {
 
-        private val receitasImages = listOf(
-            R.drawable.avatar_1,
-            R.drawable.avatar_2,
-            R.drawable.avatar_3,
-            R.drawable.avatar_4,
-            R.drawable.avatar_5,
-            R.drawable.avatar_6,
-            R.drawable.avatar_7,
-            R.drawable.avatar_8,
-            R.drawable.avatar_9,
-            R.drawable.avatar_10,
-            R.drawable.avatar_11,
-            R.drawable.avatar_12,
-            R.drawable.avatar_13,
-            R.drawable.avatar_14,
-            R.drawable.avatar_15,
-            R.drawable.avatar_16
-        )
-
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReceitasViewHolder {
-            val binding = ItemReceitaBinding.inflate(LayoutInflater.from(parent.context))
+            val binding = ItemReceitaBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             return ReceitasViewHolder(binding)
         }
 
         override fun onBindViewHolder(holder: ReceitasViewHolder, position: Int) {
-            holder.textView.text = getItem(position)
-            holder.imageView.setImageDrawable(
-                ResourcesCompat.getDrawable(holder.imageView.resources, receitasImages[position], null)
-            )
+            val recipe = getItem(position)
+            holder.textView.text = recipe.name
+             Glide.with(holder.imageView.context)
+                .load(recipe.imageUrl)
+                .placeholder(ResourcesCompat.getDrawable(holder.imageView.resources, R.drawable.egg_alt_24px, null))
+                .into(holder.imageView)
+
 
             holder.itemView.setOnClickListener {
-                mostrarDialogReceita(holder.itemView.context, getItem(position), receitasImages[position])
+                // Fetch details and show dialog
+                CoroutineScope(Dispatchers.Main).launch {
+                    val response = ApiClient.apiService.getRecipe(recipe.id)
+                    if (response.isSuccessful) {
+                        val details = response.body()
+                        if (details != null) {
+                            mostrarDialogReceita(holder.itemView.context, details)
+                        }
+                    }
+                }
             }
+
         }
 
-        private fun mostrarDialogReceita(context: Context, nome: String, imagem: Int) {
+        private fun mostrarDialogReceita(context: Context, recipe: RecipeResponse) {
             val dialog = Dialog(context)
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
             dialog.setContentView(R.layout.dialog_receita)
@@ -107,9 +107,50 @@ class ReceitasFragment : Fragment() {
             val receitaDetalhes = dialog.findViewById<TextView>(R.id.receita_detalhes)
             val fecharButton = dialog.findViewById<MaterialButton>(R.id.fechar_button)
 
-            receitaImage.setImageDrawable(ResourcesCompat.getDrawable(context.resources, imagem, null))
-            receitaNome.text = nome
-            receitaDetalhes.text = "Detalhes da receita ${nome}..."
+            val chipVegetarian = dialog.findViewById<View>(R.id.chip_vegetarian)
+            val chipVegan = dialog.findViewById<View>(R.id.chip_vegan)
+            val chipGlutenFree = dialog.findViewById<View>(R.id.chip_gluten_free)
+            val chipDairyFree = dialog.findViewById<View>(R.id.chip_dairy_free)
+            val chipVeryHealthy = dialog.findViewById<View>(R.id.chip_very_healthy)
+            val chipCheap = dialog.findViewById<View>(R.id.chip_cheap)
+            val chipVeryPopular = dialog.findViewById<View>(R.id.chip_very_popular)
+            val chipSustainable = dialog.findViewById<View>(R.id.chip_sustainable)
+
+            chipVegetarian.visibility = if (recipe.vegetarian == true) View.VISIBLE else View.GONE
+            chipVegan.visibility = if (recipe.vegan == true) View.VISIBLE else View.GONE
+            chipGlutenFree.visibility = if (recipe.glutenFree == true) View.VISIBLE else View.GONE
+            chipDairyFree.visibility = if (recipe.dairyFree == true) View.VISIBLE else View.GONE
+            chipVeryHealthy.visibility = if (recipe.veryHealthy == true) View.VISIBLE else View.GONE
+            chipCheap.visibility = if (recipe.cheap == true) View.VISIBLE else View.GONE
+            chipVeryPopular.visibility = if (recipe.veryPopular == true) View.VISIBLE else View.GONE
+            chipSustainable.visibility = if (recipe.sustainable == true) View.VISIBLE else View.GONE
+
+
+            val editTempo = dialog.findViewById<TextView>(R.id.edit_tempo)
+            editTempo.text = recipe.readyInMinutes?.let { "$it min" } ?: "N/A"
+
+            val editEquipamentos = dialog.findViewById<TextView>(R.id.edit_equipamentos)
+            val layoutEquipamentos = editEquipamentos.parent.parent as View // TextInputLayout
+            if (recipe.equipment.isNullOrEmpty()) {
+                layoutEquipamentos.visibility = View.GONE
+            } else {
+                layoutEquipamentos.visibility = View.VISIBLE
+                editEquipamentos.text = recipe.equipment.joinToString(", ") { it.name }
+            }
+
+            // Fill ingredients (comma separated)
+            val editIngredientes = dialog.findViewById<TextView>(R.id.edit_ingredientes)
+            editIngredientes.text = recipe.ingredients.joinToString(", ") { it.name }
+
+
+            receitaNome.text = recipe.title
+            receitaDetalhes.text = recipe.summary.replace("<[^>]*>".toRegex(), "")
+            receitaImage.let {
+                Glide.with(context)
+                    .load(recipe.imageUrl)
+                    .placeholder(ResourcesCompat.getDrawable(context.resources, R.drawable.egg_alt_24px, null))
+                    .into(it)
+            }
 
             fecharButton.setOnClickListener {
                 dialog.dismiss()
@@ -117,6 +158,7 @@ class ReceitasFragment : Fragment() {
 
             dialog.show()
         }
+
     }
 
     class ReceitasViewHolder(binding: ItemReceitaBinding) :

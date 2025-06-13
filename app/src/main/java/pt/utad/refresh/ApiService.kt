@@ -79,7 +79,16 @@ interface ApiService {
     @GET("Product/barcode/{barcode}")
     suspend fun getProductByBarcode(@Path("barcode") barcode: String): Response<ProductWithIngredientsDto>
 
+    @GET("Recipe/list")
+    suspend fun getRecipeList(): Response<List<RecipeInListDto>>
+
 }
+
+data class RecipeInListDto (
+    val id: Int,
+    val name: String,
+    val imageUrl: String?,
+)
 
 data class ProductWithIngredientsDto(
     val barcode: String,
