@@ -4,25 +4,25 @@ import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.view.Window
-import com.google.android.material.button.MaterialButton
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.google.android.material.textfield.TextInputLayout
-import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -54,13 +54,18 @@ class ReceitasFragment : Fragment() {
             adapter.submitList(it)
         }
 
+        // Verificar se há parâmetro de busca
+        arguments?.getString("searchQuery")?.let { query ->
+            binding.searchviewReceitas.setText(query)
+            searchRecipes(query, receitasViewModel)
+        }
+
         // Add search functionality
         binding.searchviewReceitas.setOnEditorActionListener { v, actionId, event ->
             val query = v.text.toString()
             searchRecipes(query, receitasViewModel)
             true
         }
-
 
         return root
     }
@@ -83,7 +88,6 @@ class ReceitasFragment : Fragment() {
         _binding = null
     }
 
-
     class ReceitasAdapter :
         ListAdapter<pt.utad.refresh.RecipeInListDto, ReceitasViewHolder>(object : DiffUtil.ItemCallback<pt.utad.refresh.RecipeInListDto>() {
             override fun areItemsTheSame(oldItem: pt.utad.refresh.RecipeInListDto, newItem: pt.utad.refresh.RecipeInListDto): Boolean =
@@ -102,13 +106,10 @@ class ReceitasFragment : Fragment() {
             val recipe = getItem(position)
             holder.textView.text = recipe.name
 
-
-
             Glide.with(holder.imageView.context)
                 .load(recipe.imageUrl)
                 .placeholder(ResourcesCompat.getDrawable(holder.imageView.resources, R.drawable.egg_alt_24px, null))
                 .into(holder.imageView)
-
 
             holder.itemView.setOnClickListener {
                 // Fetch details and show dialog
@@ -122,7 +123,6 @@ class ReceitasFragment : Fragment() {
                     }
                 }
             }
-
         }
 
         private fun mostrarDialogReceita(context: Context, recipe: RecipeResponse) {
@@ -139,7 +139,6 @@ class ReceitasFragment : Fragment() {
             val receitaDetalhes = dialog.findViewById<TextView>(R.id.receita_detalhes)
             val fecharButton = dialog.findViewById<MaterialButton>(R.id.fechar_button)
             val passosContainer = dialog.findViewById<LinearLayout>(R.id.passos_container)
-
 
             val chipVegetarian = dialog.findViewById<View>(R.id.chip_vegetarian)
             val chipVegan = dialog.findViewById<View>(R.id.chip_vegan)
@@ -159,7 +158,6 @@ class ReceitasFragment : Fragment() {
             chipVeryPopular.visibility = if (recipe.veryPopular == true) View.VISIBLE else View.GONE
             chipSustainable.visibility = if (recipe.sustainable == true) View.VISIBLE else View.GONE
 
-
             val editTempo = dialog.findViewById<TextView>(R.id.edit_tempo)
             editTempo.text = recipe.readyInMinutes?.let { "$it min" } ?: "N/A"
 
@@ -172,7 +170,6 @@ class ReceitasFragment : Fragment() {
                 editEquipamentos.text = recipe.equipment.joinToString("\n") { it.name }
             }
 
-            // Fill ingredients (comma separated)
             val editIngredientes = dialog.findViewById<TextView>(R.id.edit_ingredientes)
             editIngredientes.text = recipe.ingredientDets.joinToString("\n") { ing ->
                 fun formatAmount(amount: Double, unit: String): String =
@@ -202,8 +199,6 @@ class ReceitasFragment : Fragment() {
                     .placeholder(ResourcesCompat.getDrawable(context.resources, R.drawable.egg_alt_24px, null))
                     .into(it)
             }
-
-
 
             passosContainer.removeAllViews()
             val stepMargin = context.resources.getDimensionPixelSize(R.dimen.margin_8dp)
@@ -242,7 +237,6 @@ class ReceitasFragment : Fragment() {
                         1f
                     )
                 }
-
 
                 row.addView(numberView)
                 row.addView(textView)
@@ -283,7 +277,6 @@ class ReceitasFragment : Fragment() {
 
             dialog.show()
         }
-
     }
 
     class ReceitasViewHolder(binding: ItemReceitaBinding) :

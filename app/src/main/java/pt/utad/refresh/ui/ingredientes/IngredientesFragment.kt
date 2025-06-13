@@ -2,6 +2,7 @@ package pt.utad.refresh.ui.ingredientes
 import android.R.attr.fragment
 import android.content.Context
 import androidx.fragment.app.FragmentActivity
+import androidx.navigation.fragment.findNavController
 import android.os.Bundle
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -431,24 +432,40 @@ class IngredientesFragment : Fragment() {
                 val ingredient = getItem(position)
                 holder.textView?.text = ingredient.name
 
-
                 val now = System.currentTimeMillis()
                 val threeDaysMs = 3 * 24 * 60 * 60 * 1000L
                 val expTime = parseIsoDate(ingredient.expirationDate)
                 val isDanger = expTime != null && expTime - now < threeDaysMs
-
 
                 val dangerColor = ResourcesCompat.getColor(holder.textView!!.resources, R.color.danger_red, null)
                 if (isDanger) {
                     holder.textView?.setTextColor((dangerColor))
                 }
 
-
                 holder.imageView?.let { imageView ->
                     Glide.with(imageView.context)
                         .load(ingredient.imageUrl)
                         .into(imageView)
                 }
+
+                // Adicionar click listeners para nome e imagem
+                val clickListener = View.OnClickListener {
+                    val bundle = Bundle().apply {
+                        putString("searchQuery", ingredient.name)
+                    }
+                    try {
+                        fragment.findNavController().navigate(
+                            R.id.action_navigation_ingredientes_to_navigation_receitas,
+                            bundle
+                        )
+                    } catch (e: Exception) {
+                        // Handle navigation error
+                        Snackbar.make(fragment.requireView(), "Erro ao navegar para receitas", Snackbar.LENGTH_SHORT).show()
+                    }
+                }
+
+                holder.imageView?.setOnClickListener(clickListener)
+                holder.textView?.setOnClickListener(clickListener)
 
                 // Favorite button logic
                 val favoriteButton = holder.binding.buttonFavorite

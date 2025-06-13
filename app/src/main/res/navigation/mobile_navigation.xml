@@ -9,7 +9,17 @@
         android:id="@+id/nav_transform"
         android:name="pt.utad.refresh.ui.ingredientes.IngredientesFragment"
         android:label="@string/menu_transform"
-        tools:layout="@layout/fragment_ingredientes" />
+        tools:layout="@layout/fragment_ingredientes" >
+        <action
+            android:id="@+id/action_navigation_ingredientes_to_navigation_receitas"
+            app:destination="@id/nav_receitas"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            app:popUpTo="@id/nav_transform"
+            app:popUpToInclusive="true" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_scanner"
@@ -34,6 +44,4 @@
         android:name="pt.utad.refresh.ui.receitas.ReceitasFragment"
         android:label="Receitas"
         tools:layout="@layout/fragment_receitas" />
-
-
 </navigation>
