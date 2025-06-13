@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
@@ -17,15 +16,79 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import pt.utad.refresh.databinding.ActivityMainBinding
+import android.app.AlertDialog
+import android.net.Uri
+import android.widget.Toast
+import kotlinx.coroutines.withTimeout
+import java.net.URL
+
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    private fun checkAppVersionAndContinue() {
 
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val url = URL("https://refresh.jestev.es/apks/version.txt")
+                val remoteHash = withTimeout(5000) { url.readText().trim() }
+                val localHash = BuildConfig.GIT_HASH.trim()
+                // Log the hashes for debugging
+                println("Remote Hash: $remoteHash")
+                println("Local Hash: $localHash")
+                withContext(Dispatchers.Main) {
+                    if (remoteHash.isNotEmpty() && remoteHash != localHash) {
+                        AlertDialog.Builder(this@MainActivity)
+                            .setTitle("Update Available")
+                            .setMessage("A new version of the app is available. Please consider updating for the best experience.")
+                            .setPositiveButton("Update") { _, _ ->
+                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://refresh.jestev.es/apks/latest.apk"))
+                                startActivity(intent)
+                            }
+                            .setNegativeButton("Continue") { dialog, _ ->
+                                dialog.dismiss()
+                                continueAppInit()
+                            }
+                            .setCancelable(false)
+                            .show()
+                    } else {
+                        continueAppInit()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+
+                    if (e is java.net.SocketTimeoutException) {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "Não foi possível verificar atualizações: Tempo limite excedido",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    } else if (e is java.net.UnknownHostException) {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "Não foi possível verificar atualizações: Sem conexão com a internet",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    } else {
+                        e.printStackTrace()
+                    }
+
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Não foi possível verificar atualizações:\n${e.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    continueAppInit()
+                }
+            }
+        }
+
+    }
+
+    private fun continueAppInit() {
         val sessionManager = SessionManager(this)
 
         val token = sessionManager.getAuthToken()
@@ -84,6 +147,13 @@ class MainActivity : AppCompatActivity() {
             )
             it.setupWithNavController(navController)
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        checkAppVersionAndContinue()
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
