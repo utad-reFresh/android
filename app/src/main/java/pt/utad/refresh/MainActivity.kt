@@ -51,7 +51,10 @@ class MainActivity : AppCompatActivity() {
                                 dialog.dismiss()
                                 continueAppInit()
                             }
-                            .setCancelable(false)
+                            .setCancelable(true)
+                            .setOnCancelListener {
+                                continueAppInit()
+                            }
                             .show()
                     } else {
                         continueAppInit()
