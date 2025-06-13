@@ -12,15 +12,29 @@ class ReceitasViewModel : ViewModel() {
     private val _receitas = MutableLiveData<List<RecipeInListDto>>()
     val receitas: LiveData<List<RecipeInListDto>> = _receitas
 
+    private var favoriteIds: Set<Int> = emptySet()
+
     init {
         fetchReceitas()
     }
 
+    private suspend fun fetchFavoriteIds() {
+        val favResponse = ApiClient.apiService.getFavoriteRecipes()
+        if (favResponse.isSuccessful) {
+            favoriteIds = favResponse.body()?.map { it.id }?.toSet() ?: emptySet()
+
+        } else {
+            favoriteIds = emptySet()
+        }
+    }
+
     fun fetchReceitas() {
         viewModelScope.launch {
+            fetchFavoriteIds()
             val response = ApiClient.apiService.getRecipeList()
             if (response.isSuccessful) {
-                _receitas.value = response.body() ?: emptyList()
+                val list = response.body() ?: emptyList()
+                _receitas.value = list.sortedByDescending { favoriteIds.contains(it.id) }
             } else {
                 _receitas.value = emptyList()
             }
@@ -29,7 +43,7 @@ class ReceitasViewModel : ViewModel() {
 
 
     fun setReceitas(list: List<pt.utad.refresh.RecipeInListDto>) {
-        _receitas.value = list
+        _receitas.value = list.sortedByDescending { favoriteIds.contains(it.id) }
     }
 
 }
