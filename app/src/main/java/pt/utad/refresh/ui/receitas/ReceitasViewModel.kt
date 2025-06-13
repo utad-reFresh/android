@@ -26,4 +26,10 @@ class ReceitasViewModel : ViewModel() {
             }
         }
     }
+
+
+    fun setReceitas(list: List<pt.utad.refresh.RecipeInListDto>) {
+        _receitas.value = list
+    }
+
 }

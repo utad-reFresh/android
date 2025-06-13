@@ -16,6 +16,7 @@ import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -47,11 +48,35 @@ class ReceitasFragment : Fragment() {
         val recyclerView = binding.recyclerviewReceitas
         val adapter = ReceitasAdapter()
         recyclerView.adapter = adapter
+
+        // Observe receitas list
         receitasViewModel.receitas.observe(viewLifecycleOwner) {
             adapter.submitList(it)
         }
+
+        // Add search functionality
+        binding.searchviewReceitas.setOnEditorActionListener { v, actionId, event ->
+            val query = v.text.toString()
+            searchRecipes(query, receitasViewModel)
+            true
+        }
+
+
         return root
     }
+
+    private fun searchRecipes(query: String, viewModel: ReceitasViewModel) {
+        // Use coroutine to call API
+        viewLifecycleOwner.lifecycleScope.launch {
+            val response = pt.utad.refresh.ApiClient.apiService.findRecipes(query)
+            if (response.isSuccessful) {
+                val recipes = response.body() ?: emptyList()
+                viewModel.setReceitas(recipes) // Or use a method in your ViewModel to update LiveData
+            }
+        }
+    }
+
+
 
     override fun onDestroyView() {
         super.onDestroyView()

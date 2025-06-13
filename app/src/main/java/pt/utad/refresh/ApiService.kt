@@ -82,6 +82,11 @@ interface ApiService {
     @GET("Recipe/list")
     suspend fun getRecipeList(): Response<List<RecipeInListDto>>
 
+    @GET("Recipe/find")
+    suspend fun findRecipes(
+        @Query("query") ingredients: String
+    ): Response<List<RecipeInListDto>>
+
 }
 
 data class RecipeInListDto (
