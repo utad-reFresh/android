@@ -87,11 +87,20 @@ interface ApiService {
         @Query("query") ingredients: String
     ): Response<List<RecipeInListDto>>
 
+    @GET("Account/me/favoriteRecipes")
+    suspend fun getFavoriteRecipes(): Response<List<RecipeInListDto>>
+
+    @POST("Account/me/favoriteRecipe/{recipeId}")
+    suspend fun addFavoriteRecipe(@Path("recipeId") recipeId: Int): Response<Unit>
+
+    @DELETE("Account/me/favoriteRecipe/{recipeId}")
+    suspend fun removeFavoriteRecipe(@Path("recipeId") recipeId: Int): Response<Unit>
+
 }
 
 data class RecipeInListDto (
     val id: Int,
-    val name: String,
+    val title: String,
     val imageUrl: String?,
 )
 

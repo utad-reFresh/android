@@ -31,6 +31,7 @@ import pt.utad.refresh.R
 import pt.utad.refresh.RecipeResponse
 import pt.utad.refresh.databinding.FragmentReceitasBinding
 import pt.utad.refresh.databinding.ItemReceitaBinding
+import android.widget.ImageButton
 
 class ReceitasFragment : Fragment() {
     private var _binding: FragmentReceitasBinding? = null
@@ -104,7 +105,7 @@ class ReceitasFragment : Fragment() {
 
         override fun onBindViewHolder(holder: ReceitasViewHolder, position: Int) {
             val recipe = getItem(position)
-            holder.textView.text = recipe.name
+            holder.textView.text = recipe.title
 
             Glide.with(holder.imageView.context)
                 .load(recipe.imageUrl)
@@ -160,7 +161,34 @@ class ReceitasFragment : Fragment() {
 
             val editTempo = dialog.findViewById<TextView>(R.id.edit_tempo)
             editTempo.text = recipe.readyInMinutes?.let { "$it min" } ?: "N/A"
+            val favoriteButton = dialog.findViewById<ImageButton>(R.id.button_favorite_recipe)
 
+            // Fetch current favorite recipes to set initial state
+            CoroutineScope(Dispatchers.Main).launch {
+                val favResponse = ApiClient.apiService.getFavoriteRecipes()
+                val isFavorite = favResponse.isSuccessful && favResponse.body()?.any { it.id == recipe.id } == true
+                favoriteButton.setImageResource(
+                    if (isFavorite) R.drawable.favorite_filled_24px else R.drawable.favorite_24px
+                )
+                favoriteButton.isSelected = isFavorite
+
+                favoriteButton.setOnClickListener {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        val newFavorite = !favoriteButton.isSelected
+                        val response = if (newFavorite) {
+                            ApiClient.apiService.addFavoriteRecipe(recipe.id)
+                        } else {
+                            ApiClient.apiService.removeFavoriteRecipe(recipe.id)
+                        }
+                        if (response.isSuccessful) {
+                            favoriteButton.setImageResource(
+                                if (newFavorite) R.drawable.favorite_filled_24px else R.drawable.favorite_24px
+                            )
+                            favoriteButton.isSelected = newFavorite
+                        }
+                    }
+                }
+            }
             val editEquipamentos = dialog.findViewById<TextView>(R.id.edit_equipamentos)
             val layoutEquipamentos = editEquipamentos.parent.parent as View // TextInputLayout
             if (recipe.equipment.isNullOrEmpty()) {
