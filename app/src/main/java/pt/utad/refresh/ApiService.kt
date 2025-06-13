@@ -75,7 +75,17 @@ interface ApiService {
         @Query("query") query: String?
     ): Response<List<IngredientResponse>>
 
+    // In ApiService.kt
+    @GET("Product/barcode/{barcode}")
+    suspend fun getProductByBarcode(@Path("barcode") barcode: String): Response<ProductWithIngredientsDto>
+
 }
+
+data class ProductWithIngredientsDto(
+    val barcode: String,
+    val productName: String,
+    val ingredients: List<IngredientDto>
+)
 
 data class IngredientDto(
     val id: Int,

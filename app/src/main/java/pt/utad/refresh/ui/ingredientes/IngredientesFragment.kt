@@ -295,12 +295,11 @@ class IngredientesFragment : Fragment() {
             }
 
             // Save (update) ingredient
+
             saveButton.setOnClickListener {
                 val newQuantity = quantidadeField.text.toString().toIntOrNull() ?: ingredient.quantity
-                val newExpirationStr = validadeField.text?.toString()?.trim() ?: ""
-                val isoExpiration: String? = if (newExpirationStr.isEmpty()) {
-                    null
-                } else {
+                val newExpirationStr = validadeField.text.toString()
+                val isoExpiration: String? = if (newExpirationStr.isNotEmpty()) {
                     try {
                         val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
                         val date = inputFormat.parse(newExpirationStr)
@@ -310,12 +309,14 @@ class IngredientesFragment : Fragment() {
                     } catch (e: Exception) {
                         null
                     }
+                } else {
+                    null
                 }
                 fragment.viewLifecycleOwner.lifecycleScope.launch {
                     val request = UpdateIngredientRequest(
                         quantity = newQuantity,
                         isFavorite = ingredient.isFavorite,
-                        expirationDate = isoExpiration // will be null if field is empty
+                        expirationDate = isoExpiration
                     )
                     val response = apiService.addOrUpdateIngredient(ingredient.id, request)
                     if (response.isSuccessful) {
