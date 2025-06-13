@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -25,14 +28,25 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file(System.getenv("RELEASE_STORE_FILE") ?: project.property("RELEASE_STORE_FILE").toString())
-            storePassword = (System.getenv("RELEASE_STORE_PASSWORD") ?: project.property("RELEASE_STORE_PASSWORD")).toString()
-            keyAlias = (System.getenv("RELEASE_KEY_ALIAS") ?: project.property("RELEASE_KEY_ALIAS")).toString()
-            keyPassword = (System.getenv("RELEASE_KEY_PASSWORD") ?: project.property("RELEASE_KEY_PASSWORD")).toString()
-            enableV1Signing = true
-            enableV2Signing = true
-            enableV3Signing = true
-            enableV4Signing = true
+            val keystorePropertiesFile = rootProject.file("keystore.properties")
+            if (keystorePropertiesFile.exists()) {
+                val keystoreProperties = Properties().apply {
+                    load(FileInputStream(keystorePropertiesFile))
+                }
+
+                storeFile = file(
+                    System.getenv("RELEASE_STORE_FILE") ?: project.property("RELEASE_STORE_FILE")
+                        .toString()
+                )
+                storeFile = file(keystoreProperties["RELEASE_STORE_FILE"] as String)
+                storePassword = keystoreProperties["RELEASE_STORE_PASSWORD"] as String
+                keyAlias = keystoreProperties["RELEASE_KEY_ALIAS"] as String
+                keyPassword = keystoreProperties["RELEASE_KEY_PASSWORD"] as String
+                enableV1Signing = true
+                enableV2Signing = true
+                enableV3Signing = true
+                enableV4Signing = true
+            }
         }
 
     }
@@ -101,5 +115,6 @@ fun String.runCommand(): String? =
             .bufferedReader()
             .readText()
     } catch (e: Exception) {
+        e.printStackTrace()
         null
     }
