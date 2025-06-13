@@ -33,11 +33,6 @@ android {
                 val keystoreProperties = Properties().apply {
                     load(FileInputStream(keystorePropertiesFile))
                 }
-
-                storeFile = file(
-                    System.getenv("RELEASE_STORE_FILE") ?: project.property("RELEASE_STORE_FILE")
-                        .toString()
-                )
                 storeFile = file(keystoreProperties["RELEASE_STORE_FILE"] as String)
                 storePassword = keystoreProperties["RELEASE_STORE_PASSWORD"] as String
                 keyAlias = keystoreProperties["RELEASE_KEY_ALIAS"] as String
@@ -48,20 +43,22 @@ android {
                 enableV4Signing = true
             }
         }
-
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
-            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("release")
+            val keystorePropertiesFile = rootProject.file("keystore.properties")
+            if (keystorePropertiesFile.exists()) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
