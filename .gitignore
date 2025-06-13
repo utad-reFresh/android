@@ -16,6 +16,6 @@ local.properties
 
 app/release/
 
-gradle.properties
-
 .kotlin/errors/
+
+keystore.properties
