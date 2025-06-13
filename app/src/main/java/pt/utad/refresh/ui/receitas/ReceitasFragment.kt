@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
@@ -19,6 +20,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.google.android.material.textfield.TextInputLayout
+import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -55,6 +58,34 @@ class ReceitasFragment : Fragment() {
         _binding = null
     }
 
+    private fun preencherPassos(container: LinearLayout, passos: List<String>) {
+        container.removeAllViews() // Limpa passos existentes
+
+        passos.forEachIndexed { index, passo ->
+            val textInputLayout = TextInputLayout(container.context).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    setMargins(0, resources.getDimensionPixelSize(R.dimen.margin_8dp), 0, 0)
+                }
+                hint = "Passo ${index + 1}"
+            }
+
+            val editText = TextInputEditText(textInputLayout.context).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+                setText(passo)
+                isEnabled = false
+            }
+
+            textInputLayout.addView(editText)
+            container.addView(textInputLayout)
+        }
+    }
+
     class ReceitasAdapter :
         ListAdapter<pt.utad.refresh.RecipeInListDto, ReceitasViewHolder>(object : DiffUtil.ItemCallback<pt.utad.refresh.RecipeInListDto>() {
             override fun areItemsTheSame(oldItem: pt.utad.refresh.RecipeInListDto, newItem: pt.utad.refresh.RecipeInListDto): Boolean =
@@ -72,7 +103,7 @@ class ReceitasFragment : Fragment() {
         override fun onBindViewHolder(holder: ReceitasViewHolder, position: Int) {
             val recipe = getItem(position)
             holder.textView.text = recipe.name
-             Glide.with(holder.imageView.context)
+            Glide.with(holder.imageView.context)
                 .load(recipe.imageUrl)
                 .placeholder(ResourcesCompat.getDrawable(holder.imageView.resources, R.drawable.egg_alt_24px, null))
                 .into(holder.imageView)
@@ -106,6 +137,9 @@ class ReceitasFragment : Fragment() {
             val receitaNome = dialog.findViewById<TextView>(R.id.receita_nome)
             val receitaDetalhes = dialog.findViewById<TextView>(R.id.receita_detalhes)
             val fecharButton = dialog.findViewById<MaterialButton>(R.id.fechar_button)
+            val passosContainer = dialog.findViewById<LinearLayout>(R.id.passos_container)
+            val passosDaReceita = recipe.passos // Lista de strings com os passos
+            preencherPassos(passosContainer, passosDaReceita)
 
             val chipVegetarian = dialog.findViewById<View>(R.id.chip_vegetarian)
             val chipVegan = dialog.findViewById<View>(R.id.chip_vegan)
