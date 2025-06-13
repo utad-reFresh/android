@@ -363,6 +363,7 @@ class ScannerFragment : Fragment() {
         val edtPesquisa = dialogView.findViewById<TextInputEditText>(R.id.edtPesquisa)
         val nextButton = dialogView.findViewById<MaterialButton>(R.id.next_button)
         val recyclerView = dialogView.findViewById<RecyclerView>(R.id.recyclerViewResults)
+        val btnCancel = dialogView.findViewById<MaterialButton>(R.id.btnCancel)
 
         dialog.setOnDismissListener {
             isHandlingResult = false
@@ -415,6 +416,12 @@ class ScannerFragment : Fragment() {
             } else {
                 Snackbar.make(dialogView, "Insira o nome do ingrediente, em inglês.", Snackbar.LENGTH_SHORT).show()
             }
+        }
+
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+            isHandlingResult = false
+            startCamera()
         }
 
         dialog.setView(dialogView)

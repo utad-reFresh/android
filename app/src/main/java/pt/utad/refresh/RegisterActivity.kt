@@ -74,10 +74,20 @@ class RegisterActivity : AppCompatActivity() {
         if (password.length < 6) {
             tilPassword.error = "Senha deve ter pelo menos 6 caracteres"
             isValid = false
+        }    else if (!password.any { it.isDigit() }) {
+            tilPassword.error = "Senha deve conter pelo menos um número"
+            isValid = false
+        } else if (!password.any { !it.isLetterOrDigit() }) {
+            tilPassword.error = "Senha deve conter pelo menos um caractere especial"
+            isValid = false
+        } else if (!password.any { !it.isUpperCase() }) {
+            tilPassword.error = "Senha deve conter pelo menos uma letra maiúscula"
+            isValid = false
         }
 
-        if (password != confirmPassword) {
-            tilConfirmPassword.error = "Senhas não conferem"
+
+    if (password != confirmPassword) {
+            tilConfirmPassword.error = "Senhas não coincidem"
             isValid = false
         }
 
@@ -96,7 +106,7 @@ class RegisterActivity : AppCompatActivity() {
 
                 val response = ApiClient.apiService.register(request)
 
-                if (response.code() == 200) {
+                if (response.isSuccessful) {
                     Toast.makeText(
                         this@RegisterActivity,
                         "Registro realizado com sucesso!",
@@ -105,9 +115,19 @@ class RegisterActivity : AppCompatActivity() {
                     startActivity(Intent(this@RegisterActivity, LoginActivity::class.java))
                     finish()
                 } else {
+                    val errorMsg = response.errorBody()?.string()
+                    val message = try {
+                        val errors = org.json.JSONArray(errorMsg ?: "")
+                        (0 until errors.length()).joinToString("\n") {
+                            errors.getJSONObject(it).optString("description")
+                        }
+                            .ifEmpty { "Erro no registro." }
+                    } catch (e: Exception) {
+                        "Erro no registro. Código ${response.code()}"
+                    }
                     Toast.makeText(
                         this@RegisterActivity,
-                        "Erro no registro. Código: ${response.code()}",
+                        message,
                         Toast.LENGTH_LONG
                     ).show()
                 }
@@ -119,5 +139,4 @@ class RegisterActivity : AppCompatActivity() {
                 ).show()
             }
         }
-    }
-}
+    }}

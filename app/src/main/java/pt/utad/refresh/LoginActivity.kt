@@ -73,9 +73,15 @@ class LoginActivity : AppCompatActivity() {
                         finish()
                     }
                 } else {
+                    val errorMsg = response.errorBody()?.string()
+                    val message = try {
+                        org.json.JSONObject(errorMsg ?: "").optString("error", "Erro ao fazer login.")
+                    } catch (e: Exception) {
+                        "Erro ao fazer login. Código: ${response.code()}\n${e.message}"
+                    }
                     Toast.makeText(
                         this@LoginActivity,
-                        "Email ou senha incorretos",
+                        message,
                         Toast.LENGTH_LONG
                     ).show()
                 }
