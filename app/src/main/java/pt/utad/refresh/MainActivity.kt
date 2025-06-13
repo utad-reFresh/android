@@ -41,8 +41,8 @@ class MainActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     if (remoteHash.isNotEmpty() && remoteHash != localHash) {
                         AlertDialog.Builder(this@MainActivity)
-                            .setTitle("Update Available")
-                            .setMessage("A new version of the app is available. Please consider updating for the best experience.")
+                            .setTitle("Atualização disponível")
+                            .setMessage("Existe uma nova versão do reFresh disponível. Deseja atualizar agora?")
                             .setPositiveButton("Update") { _, _ ->
                                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://refresh.jestev.es/apks/latest.apk"))
                                 startActivity(intent)
