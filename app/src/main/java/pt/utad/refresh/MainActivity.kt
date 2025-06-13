@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val url = URL("https://refresh.jestev.es/apks/version.txt")
+                val url = URL("https://refresh.jestev.es/apks/version.txt?nocache=${System.currentTimeMillis()}")
                 val remoteHash = withTimeout(5000) { url.readText().trim() }
                 val localHash = BuildConfig.GIT_HASH.trim()
                 // Log the hashes for debugging
