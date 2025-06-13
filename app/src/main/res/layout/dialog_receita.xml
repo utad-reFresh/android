@@ -43,7 +43,8 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="16dp"
                 android:textSize="24sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:textAlignment="center" />
 
             <TextView
                 android:id="@+id/receita_detalhes"
@@ -55,7 +56,7 @@
                 android:textSize="16sp"
                 android:textColor="?attr/colorOnSurface"
                 android:elevation="2dp"
-                android:textAlignment="center" />
+                />
 
             <!-- Tempo de Preparo -->
             <com.google.android.material.textfield.TextInputLayout
@@ -105,7 +106,29 @@
                     android:enabled="false" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Restrições Alimentares -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Modo de Preparo"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:drawablePadding="8dp"
+                    app:drawableStartCompat="@drawable/menu_book_24px"/>
+
+                <LinearLayout
+                    android:id="@+id/passos_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
+            </LinearLayout>
+
             <com.google.android.material.chip.ChipGroup
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -116,6 +139,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Vegetariano"
+                    android:clickable="false"
                     android:checkable="true"
                     app:chipIcon="@drawable/eco_24px" />
 
@@ -124,6 +148,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Vegano"
+                    android:clickable="false"
+
                     android:checkable="true"
                     app:chipIcon="@drawable/eco_24px" />
 
@@ -132,6 +158,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Sem Glúten"
+                    android:clickable="false"
+
                     android:checkable="true"
                     app:chipIcon="@drawable/breakfast_dining_24px" />
 
@@ -140,11 +168,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Sem Lactose"
+                    android:clickable="false"
+
                     android:checkable="true"
                     app:chipIcon="@drawable/icecream_24px" />
             </com.google.android.material.chip.ChipGroup>
 
-            <!-- Características -->
             <com.google.android.material.chip.ChipGroup
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -155,6 +184,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Muito Saudável"
+                    android:clickable="false"
+
                     android:checkable="true"
                     app:chipIcon="@drawable/nutrition_24px" />
 
@@ -163,6 +194,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Econômico"
+                    android:clickable="false"
+
                     android:checkable="true"
                     app:chipIcon="@drawable/euro_symbol_24px" />
 
@@ -171,6 +204,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Muito Popular"
+                    android:clickable="false"
+
                     android:checkable="true"
                     app:chipIcon="@drawable/star_24px" />
 
@@ -179,6 +214,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Sustentável"
+                    android:clickable="false"
+
                     android:checkable="true"
                     app:chipIcon="@drawable/compost_24px" />
             </com.google.android.material.chip.ChipGroup>
