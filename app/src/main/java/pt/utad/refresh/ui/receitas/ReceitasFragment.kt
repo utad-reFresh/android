@@ -67,7 +67,7 @@ class ReceitasFragment : Fragment() {
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 ).apply {
-                    setMargins(0, resources.getDimensionPixelSize(R.dimen.margin_8dp), 0, 0)
+                    //   setMargins(0, resources.getDimensionPixelSize(R.dimen.margin_8dp), 0, 0)
                 }
                 hint = "Passo ${index + 1}"
             }
@@ -138,8 +138,8 @@ class ReceitasFragment : Fragment() {
             val receitaDetalhes = dialog.findViewById<TextView>(R.id.receita_detalhes)
             val fecharButton = dialog.findViewById<MaterialButton>(R.id.fechar_button)
             val passosContainer = dialog.findViewById<LinearLayout>(R.id.passos_container)
-            val passosDaReceita = recipe.passos // Lista de strings com os passos
-            preencherPassos(passosContainer, passosDaReceita)
+            //    val passosDaReceita = recipe.passos // Lista de strings com os passos
+            //preencherPassos(passosContainer, passosDaReceita)
 
             val chipVegetarian = dialog.findViewById<View>(R.id.chip_vegetarian)
             val chipVegan = dialog.findViewById<View>(R.id.chip_vegan)
