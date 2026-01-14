@@ -14,26 +14,26 @@ import pt.utad.refresh.R
 
 class IngredientSearchAdapter(
     private val onClick: (IngredientDto) -> Unit
-) : ListAdapter<IngredientDto, IngredientSearchAdapter.ViewHolder>(DiffCallback) {
+) : ListAdapter<IngredientDto, IngredientSearchAdapter.IngredientViewHolder>(DiffCallback) {
 
     object DiffCallback : DiffUtil.ItemCallback<IngredientDto>() {
         override fun areItemsTheSame(oldItem: IngredientDto, newItem: IngredientDto) = oldItem.id == newItem.id
         override fun areContentsTheSame(oldItem: IngredientDto, newItem: IngredientDto) = oldItem == newItem
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): IngredientViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_ingredient_search, parent, false)
-        return ViewHolder(view)
+        return IngredientViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: IngredientViewHolder, position: Int) {
         val ingredient = getItem(position)
         holder.bind(ingredient)
         holder.itemView.setOnClickListener { onClick(ingredient) }
     }
 
-    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class IngredientViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val name: TextView = itemView.findViewById(R.id.ingredient_name)
         private val image: ImageView = itemView.findViewById(R.id.ingredient_image)
 
