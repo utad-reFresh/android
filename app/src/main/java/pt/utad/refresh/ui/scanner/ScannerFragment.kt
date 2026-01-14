@@ -28,11 +28,9 @@ import org.json.JSONObject
 import android.app.AlertDialog
 import android.content.Context
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import com.bumptech.glide.Glide
 import androidx.camera.core.Camera
@@ -44,10 +42,10 @@ import pt.utad.refresh.R
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
-import pt.utad.refresh.ApiClient
 import pt.utad.refresh.ApiClient.apiService
 import pt.utad.refresh.IngredientDto
 import pt.utad.refresh.ui.ingredientes.IngredientSearchAdapter
+import androidx.core.graphics.drawable.toDrawable
 
 class ScannerFragment : Fragment() {
     private var _binding: FragmentScannerBinding? = null
@@ -116,9 +114,9 @@ class ScannerFragment : Fragment() {
                                         if (!code.isNullOrEmpty()) {
                                             isHandlingResult = true
                                             cameraProvider?.unbindAll()
-                                            fetchProduct(code) { name, brand, imageUrl, genericName, broadCategory ->
+                                            fetchProduct(code) { name, brand, imageUrl, _, _ ->
                                                 if (name != null) {
-                                                    showProductDialog(name, brand, imageUrl, genericName, broadCategory, code) {
+                                                    showProductDialog(name, brand, imageUrl, code) {
                                                         isHandlingResult = false
                                                         startCamera()
                                                     }
@@ -230,8 +228,6 @@ class ScannerFragment : Fragment() {
         name: String?,
         brand: String?,
         imageUrl: String?,
-        genericName: String?,
-        broadCategory: String?,
         barcode: String, // add this
         onDismiss: () -> Unit
     ) {
@@ -322,7 +318,7 @@ class ScannerFragment : Fragment() {
                         val isoFormat = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.getDefault())
                         isoFormat.timeZone = java.util.TimeZone.getTimeZone("UTC")
                         isoFormat.format(date!!)
-                    } catch (e: Exception) {
+                    } catch (_: Exception) {
                         null
                     }
                 } else {
@@ -334,7 +330,7 @@ class ScannerFragment : Fragment() {
                         isFavorite = selectedIngredient.isFavorite,
                         expirationDate = isoExpiration
                     )
-                    val response = pt.utad.refresh.ApiClient.apiService.addOrUpdateIngredient(selectedIngredient.id, request)
+                    val response = apiService.addOrUpdateIngredient(selectedIngredient.id, request)
                     if (response.isSuccessful) {
                         dialog.dismiss()
                         Toast.makeText(requireContext(), "Ingrediente adicionado!", Toast.LENGTH_SHORT).show()
@@ -351,7 +347,7 @@ class ScannerFragment : Fragment() {
 
         dialog.setView(dialogView)
         dialog.window?.apply {
-            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
             setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         }
         dialog.show()
@@ -381,7 +377,7 @@ class ScannerFragment : Fragment() {
         adapter.submitList(initialIngredients)
         recyclerView.visibility = if (initialIngredients.isNotEmpty()) View.VISIBLE else View.GONE
 
-        edtPesquisa.setOnEditorActionListener { v, actionId, event ->
+        edtPesquisa.setOnEditorActionListener { v, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_SEARCH) {
                 val imm = v.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(v.windowToken, 0)
@@ -396,7 +392,7 @@ class ScannerFragment : Fragment() {
             val pesquisa = edtPesquisa.text.toString()
             if (pesquisa.isNotEmpty()) {
                 lifecycleScope.launch {
-                    val response = ApiClient.apiService.searchIngredients(pesquisa)
+                    val response = apiService.searchIngredients(pesquisa)
                     if (response.isSuccessful) {
                         val results = response.body() ?: emptyList()
                         val dtoList = results.map { response ->
@@ -425,7 +421,7 @@ class ScannerFragment : Fragment() {
         }
 
         dialog.setView(dialogView)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         dialog.show()
     }
 
@@ -442,56 +438,10 @@ class ScannerFragment : Fragment() {
                         onResult(emptyList())
                     }
                 }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 withContext(Dispatchers.Main) { onResult(emptyList()) }
             }
         }
-    }
-
-    private fun showIngredientDetailsDialog(
-        name: String?,
-        brand: String?,
-        imageUrl: String?,
-        genericName: String?,
-        broadCategory: String?,
-        code: String?
-    ) {
-        val dialogView = LayoutInflater.from(requireContext())
-            .inflate(R.layout.dialog_adicionar_ingrediente, null)
-
-        dialogView.findViewById<TextView>(R.id.txtIngrediente).text = name ?: "Produto"
-
-        if (!imageUrl.isNullOrEmpty()) {
-            Glide.with(requireContext())
-                .load(imageUrl)
-                .into(dialogView.findViewById(R.id.ingredient_image))
-        }
-
-        val dialog = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog)
-            .setView(dialogView)
-            .setCancelable(false)
-            .create()
-
-        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-
-        dialogView.findViewById<MaterialButton>(R.id.save_button).setOnClickListener {
-            val quantidade = dialogView.findViewById<TextInputEditText>(R.id.edtQuantidade).text.toString()
-            val validade = dialogView.findViewById<TextInputEditText>(R.id.edtValidade).text.toString()
-
-            dialog.dismiss()
-            startCamera() // Reinicia a câmera apenas após salvar
-        }
-
-        dialogView.findViewById<TextView>(R.id.back_text).setOnClickListener {
-            dialog.dismiss()
-            showProductDialog(name, brand, imageUrl, genericName, broadCategory, code.toString()) {
-                isHandlingResult = false
-                startCamera()
-            }
-
-        }
-
-        dialog.show()
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {

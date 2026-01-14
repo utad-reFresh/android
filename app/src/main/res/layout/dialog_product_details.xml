@@ -66,28 +66,32 @@
                 android:orientation="horizontal"
                 android:layout_marginTop="24dp">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnConfirm"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="8dp"
-                    android:padding="15dp"
-                    android:text="Adicionar"
-                    android:textSize="16sp"
-                    app:cornerRadius="8dp"/>
+                           <com.google.android.material.button.MaterialButton
+                               android:id="@+id/btnConfirm"
+                               android:layout_width="0dp"
+                               android:layout_height="wrap_content"
+                               android:layout_weight="1"
+                               android:layout_marginEnd="8dp"
+                               android:padding="8dp"
+                               android:text="Adicionar"
+                               android:textSize="16sp"
+                               android:ellipsize="end"
+                               android:singleLine="true"
+                               app:cornerRadius="8dp"/>
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnCancel"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="8dp"
-                    android:padding="15dp"
-                    android:text="Cancelar"
-                    android:textSize="16sp"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    app:cornerRadius="8dp"/>
+                           <com.google.android.material.button.MaterialButton
+                               android:id="@+id/btnCancel"
+                               android:layout_width="0dp"
+                               android:layout_height="wrap_content"
+                               android:layout_weight="1"
+                               android:layout_marginStart="8dp"
+                               android:padding="8dp"
+                               android:text="Cancelar"
+                               android:textSize="16sp"
+                               android:ellipsize="end"
+                               android:singleLine="true"
+                               style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                               app:cornerRadius="8dp"/>
             </LinearLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
