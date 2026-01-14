@@ -1,25 +1,25 @@
 package pt.utad.refresh
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import com.google.android.material.navigation.NavigationView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
-import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.navigation.NavigationView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import pt.utad.refresh.databinding.ActivityMainBinding
-import android.app.AlertDialog
-import android.net.Uri
-import android.widget.Toast
 import kotlinx.coroutines.withTimeout
+import pt.utad.refresh.databinding.ActivityMainBinding
 import java.net.URL
 
 
@@ -44,7 +44,8 @@ class MainActivity : AppCompatActivity() {
                             .setTitle("Atualização disponível")
                             .setMessage("Existe uma nova versão do reFresh disponível. Deseja atualizar agora?")
                             .setPositiveButton("Update") { _, _ ->
-                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://refresh.jestev.es/apks/latest.apk"))
+                                val intent = Intent(Intent.ACTION_VIEW,
+                                    "https://refresh.jestev.es/apks/latest.apk".toUri())
                                 startActivity(intent)
                                 finish()
                             }
@@ -64,20 +65,26 @@ class MainActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
 
-                    if (e is java.net.SocketTimeoutException) {
-                        Toast.makeText(
-                            this@MainActivity,
-                            "Não foi possível verificar atualizações: Tempo limite excedido",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    } else if (e is java.net.UnknownHostException) {
-                        Toast.makeText(
-                            this@MainActivity,
-                            "Não foi possível verificar atualizações: Sem conexão com a internet",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    } else {
-                        e.printStackTrace()
+                    when (e) {
+                        is java.net.SocketTimeoutException -> {
+                            Toast.makeText(
+                                this@MainActivity,
+                                "Não foi possível verificar atualizações: Tempo limite excedido",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+
+                        is java.net.UnknownHostException -> {
+                            Toast.makeText(
+                                this@MainActivity,
+                                "Não foi possível verificar atualizações: Sem conexão com a internet",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+
+                        else -> {
+                            e.printStackTrace()
+                        }
                     }
 
                     Toast.makeText(

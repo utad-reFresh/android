@@ -3,21 +3,20 @@ package pt.utad.refresh.ui.receitas
 import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.activity.OnBackPressedCallback
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -31,7 +30,6 @@ import pt.utad.refresh.R
 import pt.utad.refresh.RecipeResponse
 import pt.utad.refresh.databinding.FragmentReceitasBinding
 import pt.utad.refresh.databinding.ItemReceitaBinding
-import android.widget.ImageButton
 
 class ReceitasFragment : Fragment() {
     private var _binding: FragmentReceitasBinding? = null
@@ -42,7 +40,7 @@ class ReceitasFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val receitasViewModel = ViewModelProvider(this).get(ReceitasViewModel::class.java)
+        val receitasViewModel = ViewModelProvider(this)[ReceitasViewModel::class.java]
         _binding = FragmentReceitasBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
@@ -74,7 +72,7 @@ class ReceitasFragment : Fragment() {
     private fun searchRecipes(query: String, viewModel: ReceitasViewModel) {
         // Use coroutine to call API
         viewLifecycleOwner.lifecycleScope.launch {
-            val response = pt.utad.refresh.ApiClient.apiService.findRecipes(query)
+            val response = ApiClient.apiService.findRecipes(query)
             if (response.isSuccessful) {
                 val recipes = response.body() ?: emptyList()
                 viewModel.setReceitas(recipes) // Or use a method in your ViewModel to update LiveData
@@ -133,7 +131,7 @@ class ReceitasFragment : Fragment() {
 
             val window = dialog.window
             window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
 
             val receitaImage = dialog.findViewById<ImageView>(R.id.receita_image)
             val receitaNome = dialog.findViewById<TextView>(R.id.receita_nome)
@@ -191,7 +189,7 @@ class ReceitasFragment : Fragment() {
             }
             val editEquipamentos = dialog.findViewById<TextView>(R.id.edit_equipamentos)
             val layoutEquipamentos = editEquipamentos.parent.parent as View // TextInputLayout
-            if (recipe.equipment.isNullOrEmpty()) {
+            if (recipe.equipment.isEmpty()) {
                 layoutEquipamentos.visibility = View.GONE
             } else {
                 layoutEquipamentos.visibility = View.VISIBLE
@@ -285,7 +283,7 @@ class ReceitasFragment : Fragment() {
                 }
             }
 
-            if (recipe.steps.isNullOrEmpty()) {
+            if (recipe.steps.isEmpty()) {
                 val noStepsView = TextView(context).apply {
                     text = "Esta receita não disponibiliza modo de preparação"
                     textSize = 16f

@@ -1,14 +1,15 @@
 package pt.utad.refresh
 
 import android.content.Context
+import androidx.core.content.edit
 
 class SessionManager(context: Context) {
     private val sharedPreferences = context.getSharedPreferences("AuthPrefs", Context.MODE_PRIVATE)
 
     fun saveAuthToken(token: String) {
-        sharedPreferences.edit()
-            .putString("jwt_token", token)
-            .apply()
+        sharedPreferences.edit {
+            putString("jwt_token", token)
+            }
     }
 
     fun getAuthToken(): String? {
@@ -16,6 +17,6 @@ class SessionManager(context: Context) {
     }
 
     fun clearSession() {
-        sharedPreferences.edit().clear().apply()
+        sharedPreferences.edit { clear() }
     }
 }

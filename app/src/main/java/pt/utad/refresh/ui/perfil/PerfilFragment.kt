@@ -7,19 +7,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.ViewModelProvider
-import com.bumptech.glide.Glide
 import androidx.activity.result.contract.ActivityResultContracts
-import pt.utad.refresh.R
-import pt.utad.refresh.databinding.FragmentPerfilBinding
+import androidx.core.net.toUri
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
+import kotlinx.coroutines.launch
 import pt.utad.refresh.ApiClient
 import pt.utad.refresh.ApiService
-import kotlinx.coroutines.launch
-import pt.utad.refresh.LoginActivity
-import pt.utad.refresh.SessionManager
 import pt.utad.refresh.BuildConfig
+import pt.utad.refresh.LoginActivity
+import pt.utad.refresh.R
+import pt.utad.refresh.SessionManager
+import pt.utad.refresh.databinding.FragmentPerfilBinding
 
 class PerfilViewModelFactory(
     private val apiService: ApiService
@@ -38,7 +39,7 @@ class PerfilFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var viewModel: PerfilViewModel
 
-    private var getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: android.net.Uri? ->
+    private var getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
             binding.profileImage.setImageURI(it)
             lifecycleScope.launch {
@@ -70,7 +71,7 @@ class PerfilFragment : Fragment() {
         textView.text = "Versão: $commitHash"
 
         textView.setOnClickListener {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(commitUrl))
+            val intent = Intent(Intent.ACTION_VIEW, commitUrl.toUri())
             startActivity(intent)
         }
 
@@ -83,7 +84,7 @@ class PerfilFragment : Fragment() {
     }
 
     private fun setupUI() {
-        var selectedPhotoUri: android.net.Uri? = null
+        var selectedPhotoUri: Uri? = null
         var photoRemoved = false
         var changeMade = false
 
@@ -110,7 +111,7 @@ class PerfilFragment : Fragment() {
             binding.profileImage.setImageResource(R.drawable.account_circle_40px)
         }
 
-        getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: android.net.Uri? ->
+        getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let {
                 selectedPhotoUri = it
                 photoRemoved = false

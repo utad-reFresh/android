@@ -49,11 +49,6 @@ interface ApiService {
         @Path("ingredientId") ingredientId: Int
     ): Response<Unit>
 
-    @GET("Account/me/ingredient/{ingredientId}")
-    suspend fun getIngredient(
-        @Path("ingredientId") ingredientId: Int
-    ): Response<IngredientResponse>
-
     @GET("Account/me/ingredients")
     suspend fun getIngredients(): Response<List<IngredientResponse>>
 
@@ -61,14 +56,6 @@ interface ApiService {
     suspend fun getRecipe(
         @Path("id") id: Int
     ): Response<RecipeResponse>
-
-    @GET("Recipe/search")
-    suspend fun searchRecipes(
-        @Query("query") query: String?
-    ): Response<List<RecipeResponse>>
-
-    @GET("Recipe/ingredients")
-    suspend fun getRecipeIngredients(): Response<List<IngredientResponse>>
 
     @GET("Recipe/search-ingredients")
     suspend fun searchIngredients(

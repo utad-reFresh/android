@@ -20,11 +20,11 @@ class ReceitasViewModel : ViewModel() {
 
     private suspend fun fetchFavoriteIds() {
         val favResponse = ApiClient.apiService.getFavoriteRecipes()
-        if (favResponse.isSuccessful) {
-            favoriteIds = favResponse.body()?.map { it.id }?.toSet() ?: emptySet()
+        favoriteIds = if (favResponse.isSuccessful) {
+            favResponse.body()?.map { it.id }?.toSet() ?: emptySet()
 
         } else {
-            favoriteIds = emptySet()
+            emptySet()
         }
     }
 
@@ -42,7 +42,7 @@ class ReceitasViewModel : ViewModel() {
     }
 
 
-    fun setReceitas(list: List<pt.utad.refresh.RecipeInListDto>) {
+    fun setReceitas(list: List<RecipeInListDto>) {
         _receitas.value = list.sortedByDescending { favoriteIds.contains(it.id) }
     }
 

@@ -1,38 +1,32 @@
 package pt.utad.refresh.ui.ingredientes
-import android.R.attr.fragment
 import android.content.Context
-import androidx.fragment.app.FragmentActivity
-import androidx.navigation.fragment.findNavController
-import android.os.Bundle
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.datepicker.MaterialDatePicker
-import com.google.android.material.snackbar.Snackbar
-import java.text.SimpleDateFormat
-import java.util.Locale
-import de.hdodenhof.circleimageview.CircleImageView
-import android.text.Editable
-import android.text.TextWatcher
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
-import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
+import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.coroutines.launch
 import pt.utad.refresh.ApiClient
 import pt.utad.refresh.ApiService
@@ -43,6 +37,8 @@ import pt.utad.refresh.databinding.FragmentIngredientesBinding
 import pt.utad.refresh.databinding.ItemTransformBinding
 import pt.utad.refresh.ui.ingredientes.IngredientesFragment.TransformViewHolder.TransformAdapter
 import pt.utad.refresh.ui.ingredientes.IngredientesViewModel.IngredientesViewModelFactory
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class IngredientesFragment : Fragment() {
 
@@ -189,7 +185,7 @@ class IngredientesFragment : Fragment() {
         }
 
         dialog.setView(dialogView)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         dialog.show()
     }
 
@@ -267,7 +263,7 @@ class IngredientesFragment : Fragment() {
 
         dialog.setView(dialogView)
         dialog.window?.apply {
-            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
             setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         }
         dialog.show()
@@ -276,8 +272,8 @@ class IngredientesFragment : Fragment() {
     class TransformViewHolder(val binding: ItemTransformBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        val imageView: ImageView? = binding.imageViewItemTransform
-        val textView: TextView? = binding.textViewItemTransform
+        val imageView: ImageView = binding.imageViewItemTransform
+        val textView: TextView = binding.textViewItemTransform
 
         fun showDetailsDialog(
             ingredient: IngredientDto,
@@ -381,7 +377,7 @@ class IngredientesFragment : Fragment() {
 
             dialog.setView(dialogView)
             dialog.window?.apply {
-                setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
                 setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
             }
             dialog.show()
@@ -469,11 +465,8 @@ class IngredientesFragment : Fragment() {
 
                 // Favorite button logic
                 val favoriteButton = holder.binding.buttonFavorite
-
-                if (favoriteButton == null) {
-                    // If the button is not present, we can skip setting it up
+                    ?: // If the button is not present, we can skip setting it up
                     return
-                }
 
                 favoriteButton.setImageResource(
                     if (ingredient.isFavorite) R.drawable.favorite_filled_24px else R.drawable.favorite_24px

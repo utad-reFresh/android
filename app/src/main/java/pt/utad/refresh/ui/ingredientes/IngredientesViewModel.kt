@@ -26,7 +26,7 @@ class IngredientesViewModel(private val apiService: ApiService) : ViewModel() {
         fetchIngredients()
     }
 
-    public fun fetchIngredients() {
+    fun fetchIngredients() {
         viewModelScope.launch {
             val response = apiService.getIngredients()
             if (response.isSuccessful) {
