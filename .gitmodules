@@ -1,0 +1,6 @@
+[submodule "core"]
+	path = core
+	url = https://github.com/utad-reFresh/core
+[submodule "docs"]
+	path = docs
+	url = https://github.com/utad-reFresh/docs
