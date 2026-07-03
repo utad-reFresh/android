@@ -1,6 +1,8 @@
 [submodule "core"]
 	path = core
 	url = https://github.com/utad-reFresh/core
+	branch = main
 [submodule "docs"]
 	path = docs
 	url = https://github.com/utad-reFresh/docs
+	branch = main
